@@ -34,6 +34,12 @@ optional arguments:
   --debug     Debug output
 ```
 
+## Requirements 
+
+- Python3
+
+No further or special Python modules are required. It should run on any system that runs Python3.
+
 ## Screenshots
 
 ![Screen1](/screenshots/screen1.png)
