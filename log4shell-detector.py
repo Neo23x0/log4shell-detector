@@ -5,6 +5,7 @@ __version__ = "0.1"
 __date__ = "2021-12-11"
 
 import os
+import sys
 import copy
 import urllib.parse
 import argparse
@@ -77,6 +78,12 @@ if __name__ == '__main__':
     print("            /___/                                                            ")
     print(" ")
     print("  Version %s, %s" % (__version__, __author__))
+    
+    if not args.p:
+        parser.print_help(sys.stderr)
+        print("")
+        print("[E] You have to select a folder to scan with -p target-folder")
+        sys.exit(1)
     
     print("")
     dateTimeObj = datetime.now()
