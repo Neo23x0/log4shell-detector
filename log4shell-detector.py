@@ -12,7 +12,7 @@ import argparse
 from datetime import datetime
 import traceback
 
-DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:ldaps:/']
+DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/']
 DEFAULT_PATHS = ['/var/log', '/storage/log/vmware', '/var/atlassian/application-data/jira/log']
 
 def check_line(line, detection_pad):
