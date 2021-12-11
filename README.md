@@ -60,3 +60,15 @@ No further or special Python modules are required. It should run on any system t
 ![Screen1](/screenshots/screen1.png)
 
 ![Screen2](/screenshots/screen2.png)
+
+## Help 
+
+There are different ways how you can help.
+
+A. Test it against the payloads that you find in-the-wild and let me know if we miss something
+B. Help me find and fix bugs
+C. Test if the scripts runs with Python 2; if not, we can add a slightly modified version to the repo
+
+## Contact
+
+Twitter: [@cyberops](https://twitter.com/cyb3rops)
