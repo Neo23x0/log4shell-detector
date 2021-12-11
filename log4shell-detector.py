@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.3"
+__version__ = "0.5"
 __date__ = "2021-12-11"
 
 import os
 import sys
 import copy
+import gzip
 import urllib.parse
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 import traceback
 
 DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/']
@@ -38,7 +39,7 @@ def check_line(line, detection_pad):
             if len(dp[detection_string]["chars"]) == dp[detection_string]["level"]:
                 return detection_string
 
-def scan_path(path, detection_pad, debug):
+def scan_path(path, detection_pad, quick, debug):
     number_of_detections = 0
     # Loop over files
     for root, directories, files in os.walk(path, followlinks=False):
@@ -47,15 +48,36 @@ def scan_path(path, detection_pad, debug):
             if debug:
                 print("[.] Processing %s ..." % file_path)
             try:
-                with open(file_path, 'r') as logfile:
-                    c = 0
-                    for line in logfile:
-                        c += 1
-                        result = check_line(line.lower(), detection_pad)
-                        if result:
-                            number_of_detections += 1
-                            print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
-                            (file_path, c, line.rstrip(), result))
+                # Gzipped logs
+                if file_path.endswith(".log.gz"):
+                    with gzip.open(file_path, 'rt') as gzlog:        
+                        c = 0
+                        for line in gzlog: 
+                            c += 1
+                            # Quick mode - timestamp check
+                            if quick and not "2021" in line and not "2022" in line:
+                                continue 
+                            # Analyze the line  
+                            result = check_line(line.lower(), detection_pad)
+                            if result:
+                                number_of_detections += 1
+                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
+                                (file_path, c, line.rstrip(), result))
+                # Plain Text
+                else:
+                    with open(file_path, 'r') as logfile:
+                        c = 0
+                        for line in logfile:
+                            c += 1
+                            # Quick mode - timestamp check
+                            if quick and not "2021" in line and not "2022" in line:
+                                continue
+                            # Analyze the line
+                            result = check_line(line.lower(), detection_pad)
+                            if result:
+                                number_of_detections += 1
+                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
+                                (file_path, c, line.rstrip(), result))
             except UnicodeDecodeError as e:
                 if args.debug:
                     print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path)
@@ -84,7 +106,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
     parser.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
-    parser.add_argument('-d', help='Maximum distance between each character', metavar='maxdis', default=30)
+    parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=30)
+    parser.add_argument('--quick', action='store_true', default=False, help="Skip log lines that don't contain a 2021 or 2022 time stamp")
     parser.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
 
@@ -105,8 +128,8 @@ if __name__ == '__main__':
         sys.exit(1)
     
     print("")
-    dateTimeObj = datetime.now()
-    print("[.] Starting scan DATE: %s" % dateTimeObj)
+    date_scan_start = datetime.now()
+    print("[.] Starting scan DATE: %s" % date_scan_start)
     
     # Prepare the detection pads
     detection_pad = prepare_detections(int(args.d))
@@ -124,7 +147,7 @@ if __name__ == '__main__':
                 print("[E] Path %s doesn't exist" % path)
             continue
         print("[+] Scanning FOLDER: %s ..." % path)
-        detections = scan_path(path, detection_pad, args.debug)
+        detections = scan_path(path, detection_pad, args.quick, args.debug)
         all_detections += detections
 
     # Finish
@@ -132,5 +155,9 @@ if __name__ == '__main__':
         print("[!!!] %d exploitation attempts detected in the complete scan" % all_detections)
     else:
         print("[.] No exploitation attempts detected in the scan")
-    dateTimeObj = datetime.now()
-    print("[.] Finished scan DATE: %s" % dateTimeObj)
+    date_scan_end = datetime.now()
+    print("[.] Finished scan DATE: %s" % date_scan_end)
+    duration = date_scan_end - date_scan_start
+    mins, secs = divmod(duration.total_seconds(), 60)
+    hours, mins = divmod(mins, 60)
+    print("[.] Scan took the followwing time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
