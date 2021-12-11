@@ -119,6 +119,10 @@ if __name__ == '__main__':
     if args.defaultpaths:
         paths = DEFAULT_PATHS
     for path in paths:
+        if not os.path.isdir(path):
+            if not args.defaultpaths:
+                print("[E] Path %s doesn't exist" % path)
+            continue
         print("[+] Scanning FOLDER: %s ..." % path)
         detections = scan_path(path, detection_pad, args.debug)
         all_detections += detections
