@@ -17,24 +17,37 @@ Split up into a list it would look like this:
 ['$', '{', 'j', 'n', 'd', 'i', ':', 'l', 'd', 'a', 'p', ':']
 ```
 
-I call these lists 'detection pads' in my script and process each log line character by character. I check if each character matches the first element of the detection pads. If the character matches the first character in one of the detection pads, it gets removed. 
+I call these lists 'detection pads' in my script and process each log line character by character. I check if each character matches the first element of the detection pads. If the character matches a character in one of the detection pads, a pointer moves forward. 
 
-When all characters of a pad have been removed, the detection triggered and the script prints the file name, the complete log line, the detected string and the number of the line in the file.
+When the pointer reaches the end of the list, the detection triggered and the script prints the file name, the complete log line, the detected string and the number of the line in the file.
 
 I've included a decoder for URL based encodings. If we need more, please let me know. 
 
 ## Usage
 
-```bash
-usage: log4shell-detector.py [-h] [-p path] [--debug]
+```help
+usage: log4shell-detector.py [-h] [-p path [path ...]] [-d maxdis] [--quick] [--defaultpaths] [--debug]
 
 Log4Shell Exploitation Detectors
 
 optional arguments:
-  -h, --help  show this help message and exit
-  -p path     Path to scan
-  --debug     Debug output
+  -h, --help          show this help message and exit
+  -p path [path ...]  Path to scan
+  -d distance         Maximum distance between each character
+  --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
+  --defaultpaths      Scan a set of default paths that should contain relevant log files.
+  --debug             Debug output
 ```
+
+## Special Flags
+
+### --quick 
+
+Only checks log lines that contain a `2021` or `2022` to exclude all scanning of older log entries. We assume that the vulnerability wasn't exploited in 2019 and earlier. 
+
+### --defaultpaths
+
+Check a list of default log paths used by different software products. 
 
 ## Requirements 
 

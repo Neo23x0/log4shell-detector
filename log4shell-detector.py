@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
     parser.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
-    parser.add_argument('-d', help='Maximum distance between each character', metavar='maxdis', default=30)
+    parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=30)
     parser.add_argument('--quick', action='store_true', default=False, help="Skip log lines that don't contain a 2021 or 2022 time stamp")
     parser.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
