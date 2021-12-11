@@ -54,7 +54,7 @@ def scan_path(path, detection_pad, debug):
                         if result:
                             number_of_detections += 1
                             print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
-                            (file_path, c, line, result))
+                            (file_path, c, line.rstrip(), result))
             except UnicodeDecodeError as e:
                 if args.debug:
                     print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
     parser.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
-    parser.add_argument('-d', help='Maximum distance between each character', metavar='maxdis', default=20)
+    parser.add_argument('-d', help='Maximum distance between each character', metavar='maxdis', default=30)
     parser.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
 
@@ -106,10 +106,9 @@ if __name__ == '__main__':
     print("")
     dateTimeObj = datetime.now()
     print("[.] Starting scan DATE: %s" % dateTimeObj)
-    print("[+] Scanning FOLDER: %s ..." % args.p)
     
     # Prepare the detection pads
-    detection_pad = prepare_detections(args.d)
+    detection_pad = prepare_detections(int(args.d))
     
     # Counter
     all_detections = 0
@@ -119,6 +118,7 @@ if __name__ == '__main__':
     if args.defaultpaths:
         paths = DEFAULT_PATHS
     for path in paths:
+        print("[+] Scanning FOLDER: %s ..." % path)
         detections = scan_path(path, detection_pad, args.debug)
         all_detections += detections
 
