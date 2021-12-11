@@ -1,2 +1,41 @@
 # log4shell-detector
+
 Detector for Log4Shell exploitation attempts
+
+## Idea
+
+The problem with the log4j CVE-2021-44228 exploitation is that the string can be heavily obfuscated in many different ways. It is impossible to cover all possible forms with a reasonable regex. 
+
+The idea behind this detector is that the respective characters have to appear in a log line in a certain order to match. 
+
+```
+${jndi:ldap:
+```
+
+Split up into a list it would look like this:
+```
+['$', '{', 'j', 'n', 'd', 'i', ':', 'l', 'd', 'a', 'p', ':']
+```
+
+I call these lists 'detection pad' in my script and process each log line character by character and check if each character matches the first element of the detection pad. If the character matches the first character in the detection pad, it gets removed. Whenever all characters of a pad have been found, a detection is triggered and I print the file name, the complete log line, the detected string and the number of the line in the file.
+
+I've included a decoder for URL based encodings. If we need more, please let me know. 
+
+## Usage
+
+```bash
+usage: log4shell-detector.py [-h] [-p path] [--debug]
+
+Log4Shell Exploitation Detectors
+
+optional arguments:
+  -h, --help  show this help message and exit
+  -p path     Path to scan
+  --debug     Debug output
+```
+
+## Screenshots
+
+![Screen1](/screenshots/screen1.png)
+
+![Screen2](/screenshots/screen2.png)
