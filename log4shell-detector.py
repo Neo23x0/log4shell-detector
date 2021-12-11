@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.1.1"
+__version__ = "0.2"
 __date__ = "2021-12-11"
 
 import os
@@ -13,6 +13,7 @@ from datetime import datetime
 import traceback
 
 DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:ldaps:/']
+DEFAULT_PATHS = ['/var/log', '/storage/log/vmware']
 
 def check_line(line, detection_pad):
     line = urllib.parse.unquote(line)
@@ -44,7 +45,7 @@ def scan_path(path, detection_pad, debug):
                         result = check_line(line.lower(), copy.deepcopy(detection_pad))
                         if result:
                             number_of_detections += 1
-                            print("[!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
+                            print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
                             (file_path, c, line, result))
             except UnicodeDecodeError as e:
                 if args.debug:
@@ -53,9 +54,10 @@ def scan_path(path, detection_pad, debug):
                 print("[E] Cant proces FILE: %s REASON: %s" % (file_path, traceback.print_exc()))
     # Result
     if number_of_detections > 0:
-        print("[!] %d exploitation attempts detected" % number_of_detections)
+        print("[!] %d exploitation attempts detected in PATH: %s" % (number_of_detections, path))
     else:
-        print("[+] No Log4Shell exploitation attempts detected")
+        print("[+] No Log4Shell exploitation attempts detected in path PATH: %s" % path)
+    return number_of_detections
 
 def prepare_detections():
     detection_pad = {}
@@ -66,7 +68,8 @@ def prepare_detections():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
-    parser.add_argument('-p', help='Path to scan', metavar='path', default='')
+    parser.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
+    parser.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
 
     args = parser.parse_args()
@@ -79,21 +82,35 @@ if __name__ == '__main__':
     print(" ")
     print("  Version %s, %s" % (__version__, __author__))
     
-    if not args.p:
+    if not args.p and not args.defaultpaths:
         parser.print_help(sys.stderr)
         print("")
-        print("[E] You have to select a folder to scan with -p target-folder")
+        print("[E] You have to select at least one folder to scan with -p target-folder or use --defaultpaths")
         sys.exit(1)
     
     print("")
     dateTimeObj = datetime.now()
     print("[.] Starting scan DATE: %s" % dateTimeObj)
     print("[+] Scanning FOLDER: %s ..." % args.p)
+    
     # Prepare the detection pads
     detection_pad = prepare_detections()
-    # Scan path
-    scan_path(args.p, detection_pad, args.debug)
+    
+    # Counter
+    all_detections = 0
+    
+    # Scan paths
+    paths = args.p
+    if args.defaultpaths:
+        paths = DEFAULT_PATHS
+    for path in paths:
+        detections = scan_path(path, detection_pad, args.debug)
+        all_detections += detections
 
     # Finish
+    if all_detections > 0:
+        print("[!!!] %d exploitation attempts detected in the complete scan" % all_detections)
+    else:
+        print("[.] No exploitation attempts detected in the scan")
     dateTimeObj = datetime.now()
     print("[.] Finished scan DATE: %s" % dateTimeObj)
