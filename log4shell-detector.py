@@ -12,9 +12,19 @@ import urllib.parse
 import argparse
 from datetime import datetime, timedelta
 import traceback
+import base64
+
 
 DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:dns:/']
 DEFAULT_PATHS = ['/var/log', '/storage/log/vmware', '/var/atlassian/application-data/jira/log']
+
+
+def decode_payload(log: str) -> str:
+    payload = ""
+    if "Base64" in log:
+        payload = base64.decodebytes(log.split("Base64/")[1].split("}")[0].encode()).decode()
+    return payload
+
 
 def check_line(line, detection_pad):
     line = urllib.parse.unquote(line)
@@ -61,8 +71,9 @@ def scan_path(path, detection_pad, quick, debug):
                             result = check_line(line.lower(), detection_pad)
                             if result:
                                 number_of_detections += 1
-                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
-                                (file_path, c, line.rstrip(), result))
+                                payload = decode_payload(line.rstrip())
+                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s DECODED_PAYLOAD: %s" % 
+                                (file_path, c, line.rstrip(), result, payload))
                 # Plain Text
                 else:
                     with open(file_path, 'r') as logfile:
@@ -76,8 +87,9 @@ def scan_path(path, detection_pad, quick, debug):
                             result = check_line(line.lower(), detection_pad)
                             if result:
                                 number_of_detections += 1
-                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
-                                (file_path, c, line.rstrip(), result))
+                                payload = decode_payload(line.rstrip())
+                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s DECODED_PAYLOAD: %s" % 
+                                (file_path, c, line.rstrip(), result, payload))
             except UnicodeDecodeError as e:
                 if args.debug:
                     print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path)
