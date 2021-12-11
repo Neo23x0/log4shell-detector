@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.3"
+__version__ = "0.4"
 __date__ = "2021-12-11"
 
 import os
 import sys
 import copy
+import gzip
 import urllib.parse
 import argparse
 from datetime import datetime
@@ -47,15 +48,26 @@ def scan_path(path, detection_pad, debug):
             if debug:
                 print("[.] Processing %s ..." % file_path)
             try:
-                with open(file_path, 'r') as logfile:
-                    c = 0
-                    for line in logfile:
-                        c += 1
-                        result = check_line(line.lower(), detection_pad)
-                        if result:
-                            number_of_detections += 1
-                            print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
-                            (file_path, c, line.rstrip(), result))
+                # Gzipped logs
+                if file_path.endswith(".log.gz"):
+                    with gzip.open(file_path, 'rt') as gzlog:        
+                        for line in gzlog:        
+                            result = check_line(line.lower(), detection_pad)
+                            if result:
+                                number_of_detections += 1
+                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
+                                (file_path, c, line.rstrip(), result))
+                # Plain Text
+                else:
+                    with open(file_path, 'r') as logfile:
+                        c = 0
+                        for line in logfile:
+                            c += 1
+                            result = check_line(line.lower(), detection_pad)
+                            if result:
+                                number_of_detections += 1
+                                print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
+                                (file_path, c, line.rstrip(), result))
             except UnicodeDecodeError as e:
                 if args.debug:
                     print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path)
