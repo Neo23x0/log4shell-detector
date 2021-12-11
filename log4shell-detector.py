@@ -12,7 +12,8 @@ import argparse
 from datetime import datetime
 import traceback
 
-DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:ldaps:/']
+DETECTION_STRINGS = ['${jndi:ldap:']
+#, '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:ldaps:/']
 DEFAULT_PATHS = ['/var/log', '/storage/log/vmware']
 
 def check_line(line, detection_pad):
@@ -26,6 +27,7 @@ def check_line(line, detection_pad):
             # If the character in the line matches the character in the detection
             if c == dp[detection_string]["chars"][dp[detection_string]["level"]]:
                 dp[detection_string]["level"] += 1
+                dp[detection_string]["current_distance"] = 0
             # If level > 0 count distance to the last char
             if dp[detection_string]["level"] > 0:
                 dp[detection_string]["current_distance"] += 1
