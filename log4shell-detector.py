@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.1"
+__version__ = "0.1.1"
 __date__ = "2021-12-11"
 
 import os
@@ -44,7 +44,7 @@ def scan_path(path, detection_pad, debug):
                         result = check_line(line.lower(), copy.deepcopy(detection_pad))
                         if result:
                             number_of_detections += 1
-                            print("[!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s STRING: %s" % 
+                            print("[!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
                             (file_path, c, line, result))
             except UnicodeDecodeError as e:
                 if args.debug:
