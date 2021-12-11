@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.2"
+__version__ = "0.3"
 __date__ = "2021-12-11"
 
 import os
@@ -19,14 +19,22 @@ def check_line(line, detection_pad):
     line = urllib.parse.unquote(line)
     linechars = list(line)
     # temporary detection pad
-    dp = detection_pad
+    dp = copy.deepcopy(detection_pad)
     # Walk over characters
     for c in linechars:
         for detection_string in dp:
-            if c == dp[detection_string][0]:
-                del dp[detection_string][0]
+            # If the character in the line matches the character in the detection
+            if c == dp[detection_string]["chars"][dp[detection_string]["level"]]:
+                dp[detection_string]["level"] += 1
+            # If level > 0 count distance to the last char
+            if dp[detection_string]["level"] > 0:
+                dp[detection_string]["current_distance"] += 1
+                # If distance is too big, reset level to zero
+                if dp[detection_string]["current_distance"] > dp[detection_string]["maximum_distance"]:
+                   dp[detection_string]["current_distance"] = 0
+                   dp[detection_string]["level"] = 0 
             # Is the pad completely empty?
-            if len(dp[detection_string]) == 0:
+            if len(dp[detection_string]["chars"]) == dp[detection_string]["level"]:
                 return detection_string
 
 def scan_path(path, detection_pad, debug):
@@ -42,7 +50,7 @@ def scan_path(path, detection_pad, debug):
                     c = 0
                     for line in logfile:
                         c += 1
-                        result = check_line(line.lower(), copy.deepcopy(detection_pad))
+                        result = check_line(line.lower(), detection_pad)
                         if result:
                             number_of_detections += 1
                             print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
@@ -59,16 +67,23 @@ def scan_path(path, detection_pad, debug):
         print("[+] No Log4Shell exploitation attempts detected in path PATH: %s" % path)
     return number_of_detections
 
-def prepare_detections():
+def prepare_detections(maximum_distance):
     detection_pad = {}
-    for d in DETECTION_STRINGS:
-        detection_pad[d] = list(d)
+    for ds in DETECTION_STRINGS:
+        detection_pad[ds] = {}
+        detection_pad[ds] = {
+            "chars": list(ds),
+            "maximum_distance": maximum_distance,
+            "current_distance": 0,
+            "level": 0
+        }
     return detection_pad
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
     parser.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
+    parser.add_argument('-d', help='Maximum distance between each character', metavar='maxdis', default=20)
     parser.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
 
@@ -94,7 +109,7 @@ if __name__ == '__main__':
     print("[+] Scanning FOLDER: %s ..." % args.p)
     
     # Prepare the detection pads
-    detection_pad = prepare_detections()
+    detection_pad = prepare_detections(args.d)
     
     # Counter
     all_detections = 0
