@@ -39,10 +39,10 @@ def scan_path(path, detection_pad, debug):
                 with open(file_path, 'r') as logfile:
                     c = 0
                     for line in logfile:
-                        c =+ 1
-                        result = check_line(line, copy.deepcopy(detection_pad))
+                        c += 1
+                        result = check_line(line.lower(), copy.deepcopy(detection_pad))
                         if result:
-                            number_of_detections =+ 1
+                            number_of_detections += 1
                             print("[!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s STRING: %s" % 
                             (file_path, c, line, result))
             except UnicodeDecodeError as e:
