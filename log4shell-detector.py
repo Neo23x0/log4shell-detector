@@ -22,8 +22,13 @@ class Log4ShellDetector(object):
     DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:dns:/']
     # These strings will be applied as they are
     PLAIN_STRINGS = {
-        " header with value of BadAttributeValueException: ": "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991502",
-        "at java.naming/com.sun.jndi.url.ldap.ldapURLContext.lookup(": "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991700",
+        "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991502": [
+            " header with value of BadAttributeValueException: "
+        ],
+        "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991700": [
+            "at java.naming/com.sun.jndi.url.ldap.ldapURLContext.lookup(", 
+            ".log4j.core.lookup.JndiLookup.lookup(JndiLookup"
+        ],
     }
 
     def __init__(self, maximum_distance, debug, quick):
@@ -44,9 +49,10 @@ class Log4ShellDetector(object):
         decoded_line = self.decode_line(line)
 
         # Plain Detection
-        for s in self.PLAIN_STRINGS:
-            if s in line or s in decoded_line:
-                return s
+        for ref, strings in self.PLAIN_STRINGS.items():
+            for s in strings:
+                if s in line or s in decoded_line:
+                    return s
 
         # Detection Pad based Detection
         # Preparation

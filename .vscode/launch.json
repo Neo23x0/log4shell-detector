@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-f", "tests/user.log.1"]
+            "args": ["-p", "tests"]
         }
     ]
 }

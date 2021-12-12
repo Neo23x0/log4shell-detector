@@ -6,7 +6,7 @@ l4s = importlib.import_module("log4shell-detector", "Log4ShellDetector")
 def test_full_path():  
     l4sd = l4s.Log4ShellDetector(maximum_distance=20, debug=False, quick=False)
     detections = l4sd.scan_path("./tests")
-    assert detections == 7
+    assert detections == 8
 
 def test_url_encoded():  
     l4sd = l4s.Log4ShellDetector(maximum_distance=20, debug=False, quick=False)
