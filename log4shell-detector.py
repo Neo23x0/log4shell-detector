@@ -134,6 +134,7 @@ class Log4ShellDetector(object):
 
     def scan_path(self, path):
         number_of_detections = 0
+        number_of_file_with_detections = 0
         # Loop over files
         for root, directories, files in os.walk(path, followlinks=False):
             for filename in files:
@@ -145,11 +146,12 @@ class Log4ShellDetector(object):
                     for m in matches_found:
                         print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
                             (file_path, m["line_number"], m["line"], m["match_string"]))
-                    number_of_detections += 1
+                        number_of_detections += 1
+                    number_of_file_with_detections += 1
 
         # Result
         if number_of_detections > 0:
-            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_detections, path))
+            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_file_with_detections, path))
         else:
             print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
