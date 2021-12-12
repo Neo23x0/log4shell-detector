@@ -8,7 +8,11 @@ import os
 import sys
 import copy
 import gzip
-import urllib.parse
+py3 = True if sys.version_info > (3, 0) else False
+if py3:
+    import urllib.parse
+else:
+    import urlparse
 import argparse
 from datetime import datetime, timedelta
 import traceback
@@ -39,7 +43,10 @@ class Log4ShellDetector(object):
     def decode_line(self, line):
         while "%" in line:
             line_before = line
-            line = urllib.parse.unquote(line)
+            if py3:
+                line = urllib.parse.unquote(line)
+            else:
+                line = urlparse.unquote(line)
             if line == line_before:
                 break
         return line
@@ -127,6 +134,7 @@ class Log4ShellDetector(object):
 
     def scan_path(self, path):
         number_of_detections = 0
+        number_of_file_with_detections = 0
         # Loop over files
         for root, directories, files in os.walk(path, followlinks=False):
             for filename in files:
@@ -138,11 +146,12 @@ class Log4ShellDetector(object):
                     for m in matches_found:
                         print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
                             (file_path, m["line_number"], m["line"], m["match_string"]))
-                    number_of_detections += 1
+                        number_of_detections += 1
+                    number_of_file_with_detections += 1
 
         # Result
         if number_of_detections > 0:
-            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_detections, path))
+            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_file_with_detections, path))
         else:
             print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
@@ -207,6 +216,7 @@ if __name__ == '__main__':
                 for m in matches_found:
                     print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
                         (f, m["line_number"], m["line"], m["match_string"]))
+                    all_detections += 1
     # Scan paths
     else:
         paths = args.p
