@@ -8,7 +8,11 @@ import os
 import sys
 import copy
 import gzip
-import urllib.parse
+py3 = True if sys.version_info > (3, 0) else False
+if py3:
+    import urllib.parse
+else:
+    import urlparse
 import argparse
 from datetime import datetime, timedelta
 import traceback
@@ -39,7 +43,10 @@ class Log4ShellDetector(object):
     def decode_line(self, line):
         while "%" in line:
             line_before = line
-            line = urllib.parse.unquote(line)
+            if py3:
+                line = urllib.parse.unquote(line)
+            else:
+                line = urlparse.unquote(line)
             if line == line_before:
                 break
         return line
