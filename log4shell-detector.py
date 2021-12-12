@@ -145,7 +145,7 @@ class Log4ShellDetector(object):
                     for m in matches_found:
                         print("[!!!] Exploitation attempt detected FILE: %s LINE_NUMBER: %d LINE: %s DEOBFUSCATED_STRING: %s" % 
                             (file_path, m["line_number"], m["line"], m["match_string"]))
-                        number_of_detections += 1
+                    number_of_detections += 1
 
         # Result
         if number_of_detections > 0:
