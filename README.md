@@ -43,7 +43,7 @@ optional arguments:
 
 ### --quick 
 
-Only checks log lines that contain a `2021` or `2022` to exclude all scanning of older log entries. We assume that the vulnerability wasn't exploited in 2019 and earlier. 
+Only checks log lines that contain a `2021` or `2022` to exclude all scanning of older log entries. We assume that the vulnerability wasn't exploited in 2020 and earlier. 
 
 ### --defaultpaths
 
@@ -65,9 +65,9 @@ No further or special Python modules are required. It should run on any system t
 
 There are different ways how you can help.
 
-A. Test it against the payloads that you find in-the-wild and let me know if we miss something
-B. Help me find and fix bugs
-C. Test if the scripts runs with Python 2; if not, we can add a slightly modified version to the repo
+1. Test it against the payloads that you find in-the-wild and let me know if we miss something
+1. Help me find and fix bugs
+1. Test if the scripts runs with Python 2; if not, we can add a slightly modified version to the repo
 
 ## Contact
 
