@@ -97,7 +97,7 @@ class Log4ShellDetector(object):
         try:
             # Gzipped logs
             suffix = "log\.(\d+\.)?gz";
-            m = re.search(suffix, str)
+            m = re.search(suffix, file_path)
             if m:
                 with gzip.open(file_path, 'rt') as gzlog:        
                     c = 0
