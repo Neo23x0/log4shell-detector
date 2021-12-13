@@ -8,6 +8,7 @@ import os
 import sys
 import copy
 import gzip
+import re
 py3 = True if sys.version_info > (3, 0) else False
 if py3:
     import urllib.parse
@@ -95,7 +96,9 @@ class Log4ShellDetector(object):
         matches_in_file = []
         try:
             # Gzipped logs
-            if file_path.endswith(".log.gz"):
+            suffix = "log\.(\d+\.)?gz";
+            m = re.search(suffix, str)
+            if m:
                 with gzip.open(file_path, 'rt') as gzlog:        
                     c = 0
                     for line in gzlog: 
