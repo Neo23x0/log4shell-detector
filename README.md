@@ -34,20 +34,25 @@ optional arguments:
   -h, --help          show this help message and exit
   -p path [path ...]  Path to scan
   -d distance         Maximum distance between each character
-  --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
   --defaultpaths      Scan a set of default paths that should contain relevant log files.
+  --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
+  --summary           Show summary only
   --debug             Debug output
 ```
 
 ## Special Flags
 
+### --defaultpaths
+
+Check a list of default log paths used by different software products. 
+
 ### --quick 
 
 Only checks log lines that contain a `2021` or `2022` to exclude all scanning of older log entries. We assume that the vulnerability wasn't exploited in 2019 and earlier. 
 
-### --defaultpaths
+### --summary
 
-Check a list of default log paths used by different software products. 
+Prints a summary of matches, with only the filename and line number.
 
 ## Requirements 
 
