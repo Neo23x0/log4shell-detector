@@ -2,7 +2,7 @@
 
 __author__ = "Florian Roth"
 __version__ = "0.7"
-__date__ = "2021-12-11"
+__date__ = "2021-12-13"
 
 import os
 import sys
@@ -35,6 +35,9 @@ class Log4ShellDetector(object):
         ],
         "https://github.com/Neo23x0/log4shell-detector/issues/5#issuecomment-991963675": [
             '${base64:JHtqbmRp'
+        ], 
+        "https://github.com/tangxiaofeng7/CVE-2021-44228-Apache-Log4j-Rce/issues/1": [
+            'Reference Class Name: foo'
         ]
     }
 
