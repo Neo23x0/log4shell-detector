@@ -131,7 +131,7 @@ class Log4ShellDetector(object):
             if self.debug:
                 print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path)
         except Exception as e:
-            print("[E] Cant proces FILE: %s REASON: %s" % (file_path, traceback.print_exc()))
+            print("[E] Can't process FILE: %s REASON: %s" % (file_path, traceback.print_exc()))
 
         return matches_in_file
 
