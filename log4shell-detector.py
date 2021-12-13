@@ -4,17 +4,16 @@ __author__ = "Florian Roth"
 __version__ = "0.7"
 __date__ = "2021-12-11"
 
+import argparse
+from collections import defaultdict
+from datetime import datetime, timedelta
 import os
-import sys
 import copy
 import gzip
-py3 = True if sys.version_info > (3, 0) else False
-if py3:
-    import urllib.parse
-else:
-    import urlparse
-import argparse
-from datetime import datetime, timedelta
+try:
+    from urllib.parse import unquote
+except ImportError:
+    from urllib import unquote
 import traceback
 
 DEFAULT_PATHS = ['/var/log', '/storage/log/vmware', '/var/atlassian/application-data/jira/log']
@@ -46,10 +45,7 @@ class Log4ShellDetector(object):
     def decode_line(self, line):
         while "%" in line:
             line_before = line
-            if py3:
-                line = urllib.parse.unquote(line)
-            else:
-                line = urlparse.unquote(line)
+            line = unquote(line)
             if line == line_before:
                 break
         return line
@@ -138,6 +134,7 @@ class Log4ShellDetector(object):
     def scan_path(self, path):
         number_of_detections = 0
         number_of_file_with_detections = 0
+        matches_dict = {}
         # Loop over files
         for root, directories, files in os.walk(path, followlinks=False):
             for filename in files:
@@ -173,11 +170,12 @@ class Log4ShellDetector(object):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
-    parser.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
-    parser.add_argument('-f', nargs='+', help='File to scan', metavar='path', default='')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
+    group.add_argument('-f', nargs='+', help='File to scan', metavar='path', default='')
+    group.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=30)
     parser.add_argument('--quick', action='store_true', default=False, help="Skip log lines that don't contain a 2021 or 2022 time stamp")
-    parser.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
 
     args = parser.parse_args()
@@ -189,12 +187,6 @@ if __name__ == '__main__':
     print("            /___/                                                            ")
     print(" ")
     print("  Version %s, %s" % (__version__, __author__))
-    
-    if not args.p and not args.defaultpaths and not args.f:
-        parser.print_help(sys.stderr)
-        print("")
-        print("[E] You have to select at least one folder to scan with -p target-folder, a file with -f file or use --defaultpaths")
-        sys.exit(1)
     
     print("")
     date_scan_start = datetime.now()
