@@ -37,10 +37,11 @@ class Log4ShellDetector(object):
         ]
     }
 
-    def __init__(self, maximum_distance, debug, quick):
+    def __init__(self, maximum_distance, debug, quick, summary):
         self.prepare_detections(maximum_distance)
         self.debug = debug
         self.quick = quick
+        self.summary = summary
 
     def decode_line(self, line):
         while "%" in line:
@@ -131,7 +132,7 @@ class Log4ShellDetector(object):
 
         return matches_in_file
 
-    def scan_path(self, path, summary):
+    def scan_path(self, path):
         matches = defaultdict(lambda: defaultdict())
         # Loop over files
         for root, directories, files in os.walk(path, followlinks=False):
@@ -143,7 +144,8 @@ class Log4ShellDetector(object):
                 if len(matches_found) > 0:
                     for m in matches_found:
                         matches[file_path][m['line_number']] = [m['line'], m['match_string']]
-        if not summary:
+                        
+        if not self.summary:
             for match in matches:
                 print('\nFILE: %s' % match)
                 for line_number in matches[match]:
@@ -156,10 +158,11 @@ class Log4ShellDetector(object):
        
         if number_of_detections > 0:
             print("\n[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
-            for match in matches:
-                print('\n  FILE: %s' % match)
-                for line_number in matches[match]:
-                    print('    LINE_NUMBER: %d' % line_number)
+            if self.summary:
+                for match in matches:
+                    print('\n  FILE: %s' % match)
+                    for line_number in matches[match]:
+                        print('    LINE_NUMBER: %d' % line_number)
         else:
             print("\n[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
@@ -202,7 +205,7 @@ if __name__ == '__main__':
     print("[.] Starting scan DATE: %s" % date_scan_start)
     
     # Create Log4Shell Detector Object
-    l4sd = Log4ShellDetector(maximum_distance=args.d, debug=args.debug, quick=args.quick)
+    l4sd = Log4ShellDetector(maximum_distance=args.d, debug=args.debug, quick=args.quick, summary=args.summary)
     
     # Counter
     all_detections = 0
@@ -223,7 +226,9 @@ if __name__ == '__main__':
                 for match in matches:
                     print('\nFILE: %s' % match)
                     for line_number in matches[match]:
-                        print('\n  LINE_NUMBER: %s\n    DEOBFUSCATED_STRING: %s' % (line_number, matches[match][line_number]))
+                        print('\n  LINE_NUMBER: %s\n    DEOBFUSCATED_STRING: %s' % 
+                            (line_number, matches[match], matches[match][line_number])
+                        )
             all_detections = len(matches[f].keys())
     # Scan paths
     else:
@@ -236,7 +241,7 @@ if __name__ == '__main__':
                     print("[E] Path %s doesn't exist" % path)
                 continue
             print("[+] Scanning FOLDER: %s ..." % path)
-            detections = l4sd.scan_path(path, args.summary)
+            detections = l4sd.scan_path(path)
             all_detections += detections
 
     # Finish
