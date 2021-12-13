@@ -2,7 +2,7 @@
 
 __author__ = "Florian Roth"
 __version__ = "0.8"
-__date__ = "2021-12-11"
+__date__ = "2021-12-13"
 
 import argparse
 from collections import defaultdict
@@ -34,6 +34,9 @@ class Log4ShellDetector(object):
         ],
         "https://github.com/Neo23x0/log4shell-detector/issues/5#issuecomment-991963675": [
             '${base64:JHtqbmRp'
+        ], 
+        "https://github.com/tangxiaofeng7/CVE-2021-44228-Apache-Log4j-Rce/issues/1": [
+            'Reference Class Name: foo'
         ]
     }
 
@@ -89,8 +92,8 @@ class Log4ShellDetector(object):
         matches_in_file = []
         try:
             # Gzipped logs
-            if file_path.endswith(".log.gz"):
-                with gzip.open(file_path, 'rt') as gzlog:        
+            if "log." in file_path and file_path.endswith(".gz"):
+                with gzip.open(file_path, 'rt') as gzlog:
                     c = 0
                     for line in gzlog: 
                         c += 1
