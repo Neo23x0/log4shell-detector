@@ -160,7 +160,7 @@ class Log4ShellDetector(object):
             if self.summary:
                 for match in matches:
                     for line_number in matches[match]:
-                        print('[!] FILE: %s LINE_NUMBER: %d' % (match, line_number))
+                        print('[!] FILE: %s LINE_NUMBER: %d STRING: %s' % (match, line_number, matches[match][line_number][1]))
         else:
             print("\n[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
@@ -215,7 +215,7 @@ if __name__ == '__main__':
             if not os.path.isfile(f):
                 print("[E] File %s doesn't exist" % f)
                 continue
-            print("[+] Scanning FILE: %s ..." % f)
+            print("[.] Scanning FILE: %s ..." % f)
             matches = defaultdict(lambda: defaultdict())
             matches_found = l4sd.scan_file(f)
             if len(matches_found) > 0:
@@ -237,7 +237,7 @@ if __name__ == '__main__':
                 if not args.defaultpaths:
                     print("[E] Path %s doesn't exist" % path)
                 continue
-            print("[+] Scanning FOLDER: %s ..." % path)
+            print("[.] Scanning FOLDER: %s ..." % path)
             detections = l4sd.scan_path(path)
             all_detections += detections
 
