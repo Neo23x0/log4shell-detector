@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.7"
+__version__ = "0.8"
 __date__ = "2021-12-11"
 
 import argparse
@@ -147,9 +147,8 @@ class Log4ShellDetector(object):
                         
         if not self.summary:
             for match in matches:
-                print('\nFILE: %s' % match)
                 for line_number in matches[match]:
-                    print('\n  LINE_NUMBER: %s\n    DEOBFUSCATED_STRING: %s' % (line_number, matches[match][line_number]))
+                    print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s LINE: %s' % (match, line_number, matches[match][line_number][1], matches[match][line_number][0]))
         # Result
         number_of_detections = 0
         number_of_files_with_detections = len(matches.keys())
@@ -157,12 +156,11 @@ class Log4ShellDetector(object):
             number_of_detections += len(matches[file_path].keys())
        
         if number_of_detections > 0:
-            print("\n[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
+            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
             if self.summary:
                 for match in matches:
-                    print('\n  FILE: %s' % match)
                     for line_number in matches[match]:
-                        print('    LINE_NUMBER: %d' % line_number)
+                        print('[!] FILE: %s LINE_NUMBER: %d' % (match, line_number))
         else:
             print("\n[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
@@ -224,10 +222,9 @@ if __name__ == '__main__':
                 for m in matches_found:
                     matches[f][m['line_number']] = [m['line'], m['match_string']]
                 for match in matches:
-                    print('\nFILE: %s' % match)
                     for line_number in matches[match]:
-                        print('\n  LINE_NUMBER: %s\n    DEOBFUSCATED_STRING: %s' % 
-                            (line_number, matches[match], matches[match][line_number])
+                        print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s' % 
+                            (match, line_number, matches[match], matches[match][line_number])
                         )
             all_detections = len(matches[f].keys())
     # Scan paths
@@ -246,12 +243,12 @@ if __name__ == '__main__':
 
     # Finish
     if all_detections > 0:
-        print("\n[!!!] %d exploitation attempts detected in the complete scan" % all_detections)
+        print("[!!!] %d exploitation attempts detected in the complete scan" % all_detections)
         
     else:
-        print("\n[.] No exploitation attempts detected in the scan")
+        print("[.] No exploitation attempts detected in the scan")
     date_scan_end = datetime.now()
-    print("\n[.] Finished scan DATE: %s" % date_scan_end)
+    print("[.] Finished scan DATE: %s" % date_scan_end)
     duration = date_scan_end - date_scan_start
     mins, secs = divmod(duration.total_seconds(), 60)
     hours, mins = divmod(mins, 60)
