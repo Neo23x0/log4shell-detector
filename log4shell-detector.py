@@ -131,7 +131,7 @@ class Log4ShellDetector(object):
 
         return matches_in_file
 
-    def scan_path(self, path):
+    def scan_path(self, path, summary):
         matches = defaultdict(lambda: defaultdict())
         # Loop over files
         for root, directories, files in os.walk(path, followlinks=False):
@@ -143,10 +143,11 @@ class Log4ShellDetector(object):
                 if len(matches_found) > 0:
                     for m in matches_found:
                         matches[file_path][m['line_number']] = [m['line'], m['match_string']]
-        for match in matches:
-            print('\nFILE: %s' % match)
-            for line_number in matches[match]:
-                print('\n  LINE_NUMBER: %s\n    DEOBFUSCATED_STRING: %s' % (line_number, matches[match][line_number]))
+        if not summary:
+            for match in matches:
+                print('\nFILE: %s' % match)
+                for line_number in matches[match]:
+                    print('\n  LINE_NUMBER: %s\n    DEOBFUSCATED_STRING: %s' % (line_number, matches[match][line_number]))
         # Result
         number_of_detections = 0
         number_of_files_with_detections = len(matches.keys())
@@ -155,8 +156,10 @@ class Log4ShellDetector(object):
        
         if number_of_detections > 0:
             print("\n[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
-            for f in matches.keys():
-                print('  FILE: %s' % f)
+            for match in matches:
+                print('\n  FILE: %s' % match)
+                for line_number in matches[match]:
+                    print('    LINE_NUMBER: %d' % line_number)
         else:
             print("\n[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
@@ -178,10 +181,11 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
     group.add_argument('-f', nargs='+', help='File to scan', metavar='path', default='')
-    group.add_argument('--defaultpaths', action='store_true', default=False, help='Scan a set of default paths that should contain relevant log files.')
+    group.add_argument('--defaultpaths', action='store_true', help='Scan a set of default paths that should contain relevant log files.')
     parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=30)
-    parser.add_argument('--quick', action='store_true', default=False, help="Skip log lines that don't contain a 2021 or 2022 time stamp")
-    parser.add_argument('--debug', action='store_true', default=False, help='Debug output')
+    parser.add_argument('--quick', action='store_true', help="Skip log lines that don't contain a 2021 or 2022 time stamp")
+    parser.add_argument('--debug', action='store_true', help='Debug output')
+    parser.add_argument('--summary', action='store_true', help='Show summary only')
 
     args = parser.parse_args()
     
@@ -232,7 +236,7 @@ if __name__ == '__main__':
                     print("[E] Path %s doesn't exist" % path)
                 continue
             print("[+] Scanning FOLDER: %s ..." % path)
-            detections = l4sd.scan_path(path)
+            detections = l4sd.scan_path(path, args.summary)
             all_detections += detections
 
     # Finish
