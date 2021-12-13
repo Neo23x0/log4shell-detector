@@ -244,4 +244,4 @@ if __name__ == '__main__':
     duration = date_scan_end - date_scan_start
     mins, secs = divmod(duration.total_seconds(), 60)
     hours, mins = divmod(mins, 60)
-    print("[.] Scan took the followwing time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
+    print("[.] Scan took the following time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
