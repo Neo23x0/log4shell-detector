@@ -95,8 +95,8 @@ class Log4ShellDetector(object):
         matches_in_file = []
         try:
             # Gzipped logs
-            if file_path.endswith(".log.gz"):
-                with gzip.open(file_path, 'rt') as gzlog:        
+            if "log." in file_path and file_path.endswith(".gz"):
+                with gzip.open(file_path, 'rt') as gzlog:
                     c = 0
                     for line in gzlog: 
                         c += 1
