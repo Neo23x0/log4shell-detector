@@ -226,8 +226,8 @@ if __name__ == '__main__':
                     matches[f][m['line_number']] = [m['line'], m['match_string']]
                 for match in matches:
                     for line_number in matches[match]:
-                        print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s' % 
-                            (match, line_number, matches[match], matches[match][line_number])
+                        print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s LINE: %s' % 
+                            (match, line_number, matches[match][line_number][1], matches[match][line_number][0])
                         )
             all_detections = len(matches[f].keys())
     # Scan paths
