@@ -25,9 +25,6 @@ class detector(object):
             "at java.naming/com.sun.jndi.url.ldap.ldapURLContext.lookup(", 
             ".log4j.core.lookup.JndiLookup.lookup(JndiLookup"
         ],
-        "https://github.com/Neo23x0/log4shell-detector/issues/5#issuecomment-991963675": [
-            '${base64:JHtqbmRp'
-        ], 
         "https://github.com/tangxiaofeng7/CVE-2021-44228-Apache-Log4j-Rce/issues/1": [
             'Reference Class Name: foo'
         ]
@@ -47,15 +44,15 @@ class detector(object):
                 break
         return line
 
-    def base64_decode(m):
-        return base64.b64decode(m.group(2))
+    def base64_decode(self,m):
+        return base64.b64decode(m.group(1)).decode("utf-8")
 
     def check_line(self, line):
         # Decode Line
         decoded_line = self.decode_line(line)
 
         # Base64 sub
-        decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, line)
+        decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, decoded_line)
 
         # Plain Detection
         for ref, strings in self.PLAIN_STRINGS.items():
