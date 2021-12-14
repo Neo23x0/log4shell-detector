@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.8.1"
+__version__ = "0.9.0"
 __date__ = "2021-12-14"
 
+import sys
 import argparse
 from collections import defaultdict
 from datetime import datetime, timedelta
 import os
 import copy
 import gzip
+import subprocess
 try:
     from urllib.parse import unquote
 except ImportError:
     from urllib import unquote
 import traceback
-
-DEFAULT_PATHS = ['/var/log', '/storage/log/vmware', '/var/atlassian/application-data/jira/log']
-
 
 class Log4ShellDetector(object):
 
@@ -130,6 +129,8 @@ class Log4ShellDetector(object):
         except UnicodeDecodeError as e:
             if self.debug:
                 print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path)
+        except PermissionError as e:
+            print("[E] Can't access %s due to a permission problem." % file_path)
         except Exception as e:
             print("[E] Can't process FILE: %s REASON: %s" % (file_path, traceback.print_exc()))
 
@@ -165,7 +166,7 @@ class Log4ShellDetector(object):
                     for line_number in matches[match]:
                         print('[!] FILE: %s LINE_NUMBER: %d STRING: %s' % (match, line_number, matches[match][line_number][1]))
         else:
-            print("\n[+] No files with exploitation attempts detected in path PATH: %s" % path)
+            print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
 
     def prepare_detections(self, maximum_distance):
@@ -179,13 +180,30 @@ class Log4ShellDetector(object):
                 "level": 0
             }
 
+def evaluate_log_paths():
+    paths = []
+    print("[.] Automatically evaluating the folders to which apps write logs ...")
+    command = "lsof 2>/dev/null | grep '\.log' | sed 's/.* \//\//g' | sort | uniq"
+    path_eval = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    output = path_eval.communicate()[0].splitlines()
+    for o in output:
+        path = os.path.dirname(o)
+        if isinstance(path, bytes):
+            path = path.decode("utf-8")
+        if path in paths: 
+            continue
+        paths.append(path)
+        if args.debug:
+            print("[D] Adding PATH: %s" % path)
+    return paths
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
     group.add_argument('-f', nargs='+', help='File to scan', metavar='path', default='')
-    group.add_argument('--defaultpaths', action='store_true', help='Scan a set of default paths that should contain relevant log files.')
+    group.add_argument('--auto', action='store_true', help='Automatically evaluate locations to which logs get written and scan these folders recursively (new default if no path is given)')
     parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=30)
     parser.add_argument('--quick', action='store_true', help="Skip log lines that don't contain a 2021 or 2022 time stamp")
     parser.add_argument('--debug', action='store_true', help='Debug output')
@@ -230,15 +248,27 @@ if __name__ == '__main__':
                             (match, line_number, matches[match][line_number][1], matches[match][line_number][0])
                         )
             all_detections = len(matches[f].keys())
+    
     # Scan paths
     else:
+        # Paths
         paths = args.p
-        if args.defaultpaths:
-            paths = DEFAULT_PATHS
+        # Automatic path evaluation
+        auto_eval_paths = False
+        if args.auto:
+            auto_eval_paths = True
+        # Parameter evaluation
+        if len(paths) == 0 and not auto_eval_paths:
+            print("[W] Warning: You haven't selected a path (-p path) or automatic evaluation of log paths (--auto). Log4Shell-Detector will activate the automatic path evaluation (--auto) for your convenience.")
+            auto_eval_paths = True
+        # Automatic path evaluation
+        if auto_eval_paths:
+            log_paths = evaluate_log_paths()
+            paths = log_paths
+        # Now scan these paths
         for path in paths:
             if not os.path.isdir(path):
-                if not args.defaultpaths:
-                    print("[E] Path %s doesn't exist" % path)
+                print("[E] Path %s doesn't exist" % path)
                 continue
             print("[.] Scanning FOLDER: %s ..." % path)
             detections = l4sd.scan_path(path)
