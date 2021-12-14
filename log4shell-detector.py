@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 __date__ = "2021-12-14"
 
 import sys
