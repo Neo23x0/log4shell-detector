@@ -37,9 +37,6 @@ class Log4ShellDetector(object):
         ], 
         "https://github.com/tangxiaofeng7/CVE-2021-44228-Apache-Log4j-Rce/issues/1": [
             'Reference Class Name: foo'
-        ],
-        "https://github.com/SigmaHQ/sigma/blob/master/rules/web/web_cve_2021_44228_log4j_fields.yml#L40": [
-            '${base64:JHtqbmRp'
         ]
     }
 
