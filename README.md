@@ -4,24 +4,25 @@ Detector for Log4Shell exploitation attempts
 
 ## Idea
 
-The problem with the log4j CVE-2021-44228 exploitation is that the string can be heavily obfuscated in many different ways. It is impossible to cover all possible forms with a reasonable regular expression. 
+The problem with the log4j CVE-2021-44228 exploitation is that the string can be heavily obfuscated in many different ways. It is impossible to cover all possible forms with a reasonable regular expression.
 
-The idea behind this detector is that the respective characters have to appear in a log line in a certain order to match. 
+The idea behind this detector is that the respective characters have to appear in a log line in a certain order to match.
 
-```
+```none
 ${jndi:ldap:
 ```
 
 Split up into a list it would look like this:
-```
+
+```none
 ['$', '{', 'j', 'n', 'd', 'i', ':', 'l', 'd', 'a', 'p', ':']
 ```
 
-I call these lists 'detection pads' in my script and process each log line character by character. I check if each character matches the first element of the detection pads. If the character matches a character in one of the detection pads, a pointer moves forward. 
+I call these lists 'detection pads' in my script and process each log line character by character. I check if each character matches the first element of the detection pads. If the character matches a character in one of the detection pads, a pointer moves forward.
 
 When the pointer reaches the end of the list, the detection triggered and the script prints the file name, the complete log line, the detected string and the number of the line in the file.
 
-I've included a decoder for URL based encodings. If we need more, please let me know. 
+I've included a decoder for URL based encodings. If we need more, please let me know.
 
 ## Usage
 
@@ -40,25 +41,71 @@ optional arguments:
   --summary           Show summary only
 ```
 
+## Get started
+
+1. Make sure that the target systems on which you'd like to run `log4shell-detector` has python installed: `python -V` and see if Python 3 is available `python3 -V`
+
+2. Download this Repo by clicking "Code" > "Download ZIP"
+
+3. Extract the package and bring only `log4shell-detector.py` to the target system (e.g. with scp)
+
+4. Run it with `python3 log4shell-detector.py -p /var/log` (if `python3` isn't available use `python`)
+
+5. If your applications log to a different folder than `/var/log` find out where the log files reside and scan these folders. Find locations to which apps write logs with `lsof | grep '\.log'`.
+
+6. Review the results (see FAQs for details)
+
+## FAQs
+
+### I don't use log4j on that server but the scanner reports exploitation attempts. Am I affected?
+
+No. But can you be sure that no application uses log4j?
+
+You can try to find evidence of log4j usage running these commands:
+
+```bash
+ps aux | egrep '[l]og4j'
+find / -name "log4j*"
+lsof | grep log4j
+```
+
+If none of these commands returned a result, you should be safe.
+
+### My applications use log4j and I've found evidence of exploitation attempts? Am I compromised?
+
+It is possible, yes. First check if the application that you use is actually affected by the vulnerability. Check the JAVA and log4j versions, check the vendor's blog for an advisory or test the application yourself using [canary tokens](https://twitter.com/cyb3rops/status/1469405846010572816).
+
+If your application is affected and vulnerable and you plan to do a forensic investigation,
+
+1. create a memory image of that system (use e.g. VMWare's [snapshots](https://blogs.vmware.com/networkvirtualization/2021/03/memory-forensics-for-virtualized-hosts.html/) or other tools for that)
+
+2. create a disk image of that system
+
+3. check the system's outgoing network connections in your firewall logs
+
+4. check the system's crontab for suspicious new entries (`/etc/crontab`). If you want and can, use our free tool [THOR Lite](https://www.nextron-systems.com/thor-lite/) for a basic compromise assessment.
+
+5. After some investigations, decide if you want and can disconnect that system from the Internet until you've verified that it hasn't been compromised.
+
 ## Special Flags
 
 ### --defaultpaths
 
-Check a list of default log paths used by different software products. 
+Check a list of default log paths used by different software products.
 
-### --quick 
+### --quick
 
-Only checks log lines that contain a `2021` or `2022` to exclude all scanning of older log entries. We assume that the vulnerability wasn't exploited in 2019 and earlier. 
+Only checks log lines that contain a `2021` or `2022` to exclude all scanning of older log entries. We assume that the vulnerability wasn't exploited in 2019 and earlier.
 
 ### --summary
 
 Prints a summary of matches, with only the filename and line number.
 
-## Requirements 
+## Requirements
 
-- Python3
+- Python 2 or Python 3
 
-No further or special Python modules are required. It should run on any system that runs Python3.
+No further or special Python modules are required. It should run on any system that runs Python.
 
 ## Screenshots
 
@@ -66,7 +113,7 @@ No further or special Python modules are required. It should run on any system t
 
 ![Screen2](/screenshots/screen2.png)
 
-## Help 
+## Help
 
 There are different ways how you can help.
 
