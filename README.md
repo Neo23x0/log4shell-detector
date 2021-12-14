@@ -2,6 +2,13 @@
 
 Detector for Log4Shell exploitation attempts
 
+## What it does and doesn't do
+
+It does: It checks local log files for indicators of exploitation attempts, even heavily obfuscated ones that string or regular expression based patterns wouldn't detect.
+
+- It doesn't find vulnerable applications
+- It doesn't and can't verify if the exploitation attempts were successful
+
 ## Idea
 
 The problem with the log4j CVE-2021-44228 exploitation is that the string can be heavily obfuscated in many different ways. It is impossible to cover all possible forms with a reasonable regular expression.
