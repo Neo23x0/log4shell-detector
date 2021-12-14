@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.8"
-__date__ = "2021-12-13"
+__version__ = "0.8.1"
+__date__ = "2021-12-14"
 
 import argparse
 from collections import defaultdict
@@ -37,6 +37,9 @@ class Log4ShellDetector(object):
         ], 
         "https://github.com/tangxiaofeng7/CVE-2021-44228-Apache-Log4j-Rce/issues/1": [
             'Reference Class Name: foo'
+        ],
+        "https://github.com/SigmaHQ/sigma/blob/master/rules/web/web_cve_2021_44228_log4j_fields.yml#L40": [
+            '${base64:JHtqbmRp'
         ]
     }
 
