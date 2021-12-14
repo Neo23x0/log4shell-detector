@@ -200,7 +200,7 @@ def evaluate_log_paths():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
     group.add_argument('-f', nargs='+', help='File to scan', metavar='path', default='')
     group.add_argument('--auto', action='store_true', help='Automatically evaluate locations to which logs get written and scan these folders recursively (new default if no path is given)')
