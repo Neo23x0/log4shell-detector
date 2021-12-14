@@ -72,7 +72,7 @@ You can try to find evidence of log4j usage running these commands:
 
 ```bash
 ps aux | egrep '[l]og4j'
-find / -name "log4j*"
+find / -iname "log4j*"
 lsof | grep log4j
 ```
 
