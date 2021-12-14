@@ -1,7 +1,7 @@
 
 import base64
 import re
-from collections import defaultdict
+
 import os
 import copy
 import gzip
@@ -30,11 +30,10 @@ class detector(object):
         ]
     }
 
-    def __init__(self, maximum_distance, debug, quick, summary):
+    def __init__(self, maximum_distance, debug, quick):
         self.prepare_detections(maximum_distance)
         self.debug = debug
         self.quick = quick
-        self.summary = summary
 
     def decode_line(self, line):
         while "%" in line:
@@ -137,39 +136,6 @@ class detector(object):
             print("[E] Can't process FILE: %s REASON: %s" % (file_path, traceback.print_exc()))
 
         return matches_in_file
-
-    def scan_path(self, path):
-        matches = defaultdict(lambda: defaultdict())
-        # Loop over files
-        for root, directories, files in os.walk(path, followlinks=False):
-            for filename in files:
-                file_path = os.path.join(root, filename)
-                if self.debug:
-                    print("[.] Processing %s ..." % file_path)
-                matches_found = self.scan_file(file_path)
-                if len(matches_found) > 0:
-                    for m in matches_found:
-                        matches[file_path][m['line_number']] = [m['line'], m['match_string']]
-                        
-        if not self.summary:
-            for match in matches:
-                for line_number in matches[match]:
-                    print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s LINE: %s' % (match, line_number, matches[match][line_number][1], matches[match][line_number][0]))
-        # Result
-        number_of_detections = 0
-        number_of_files_with_detections = len(matches.keys())
-        for file_path in matches:
-            number_of_detections += len(matches[file_path].keys())
-       
-        if number_of_detections > 0:
-            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
-            if self.summary:
-                for match in matches:
-                    for line_number in matches[match]:
-                        print('[!] FILE: %s LINE_NUMBER: %d STRING: %s' % (match, line_number, matches[match][line_number][1]))
-        else:
-            print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
-        return number_of_detections
 
     def prepare_detections(self, maximum_distance):
         self.detection_pad = {}

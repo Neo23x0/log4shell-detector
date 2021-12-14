@@ -8,6 +8,7 @@ import argparse
 import os
 import subprocess
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 import Log4ShellDetector
 
@@ -55,11 +56,44 @@ if __name__ == '__main__':
     print("[.] Starting scan DATE: %s" % date_scan_start)
     
     # Create Log4Shell Detector Object
-    l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick, summary=args.summary)
+    l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick)
     
     # Counter
     all_detections = 0
     
+    def scan_path(l4sd, path, summary):
+        matches = defaultdict(lambda: defaultdict())
+        # Loop over files
+        for root, directories, files in os.walk(path, followlinks=False):
+            for filename in files:
+                file_path = os.path.join(root, filename)
+                if l4sd.debug:
+                    print("[.] Processing %s ..." % file_path)
+                matches_found = l4sd.scan_file(file_path)
+                if len(matches_found) > 0:
+                    for m in matches_found:
+                        matches[file_path][m['line_number']] = [m['line'], m['match_string']]
+                        
+        if not summary:
+            for match in matches:
+                for line_number in matches[match]:
+                    print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s LINE: %s' % (match, line_number, matches[match][line_number][1], matches[match][line_number][0]))
+        # Result
+        number_of_detections = 0
+        number_of_files_with_detections = len(matches.keys())
+        for file_path in matches:
+            number_of_detections += len(matches[file_path].keys())
+       
+        if number_of_detections > 0:
+            print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
+            if summary:
+                for match in matches:
+                    for line_number in matches[match]:
+                        print('[!] FILE: %s LINE_NUMBER: %d STRING: %s' % (match, line_number, matches[match][line_number][1]))
+        else:
+            print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
+        return number_of_detections
+
     # Scan file
     if args.f:
         files = args.f 
@@ -102,7 +136,7 @@ if __name__ == '__main__':
                 print("[E] Path %s doesn't exist" % path)
                 continue
             print("[.] Scanning FOLDER: %s ..." % path)
-            detections = l4sd.scan_path(path)
+            detections = scan_path(l4sd,path,args.summary)
             all_detections += detections
 
     # Finish
