@@ -204,7 +204,7 @@ if __name__ == '__main__':
     group.add_argument('-p', nargs='+', help='Path to scan', metavar='path', default='')
     group.add_argument('-f', nargs='+', help='File to scan', metavar='path', default='')
     group.add_argument('--auto', action='store_true', help='Automatically evaluate locations to which logs get written and scan these folders recursively (new default if no path is given)')
-    parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=30)
+    parser.add_argument('-d', help='Maximum distance between each character', metavar='distance', default=40)
     parser.add_argument('--quick', action='store_true', help="Skip log lines that don't contain a 2021 or 2022 time stamp")
     parser.add_argument('--debug', action='store_true', help='Debug output')
     parser.add_argument('--summary', action='store_true', help='Show summary only')
