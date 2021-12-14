@@ -16,8 +16,11 @@ try:
 except ImportError:
     from urllib import unquote
 import traceback
+
+_std_supported = False
 try:
     import zstandard
+    _std_supported = True
 except ImportError:
     print("[!] No support for zstandared files without 'zstandard' libary")
 
@@ -116,7 +119,7 @@ class Log4ShellDetector(object):
                             }
                             matches_in_file.append(matches_dict)
             # Zstandard logs
-            elif "log." in file_path and file_path.endswith(".zst"):
+            elif _std_supported and "log." in file_path and file_path.endswith(".zst"):
                 with open(file_path, 'rb') as compressed:
                     dctx = zstandard.ZstdDecompressor()
                     stream_reader = dctx.stream_reader(compressed)
@@ -283,3 +286,4 @@ if __name__ == '__main__':
     mins, secs = divmod(duration.total_seconds(), 60)
     hours, mins = divmod(mins, 60)
     print("[.] Scan took the following time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
+
