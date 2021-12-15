@@ -2,7 +2,6 @@ import sys, os
 import importlib
 import base64
 import gzip
-from shutil import copyfile
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 l4s = importlib.import_module("log4shell-detector", "Log4ShellDetector")
 
