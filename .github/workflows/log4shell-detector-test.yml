@@ -22,11 +22,8 @@ jobs:
       include:
       - os: macos-latest
         python-version: 3.9
-    runs-on: ${{ matrix.os }}
+  runs-on: ${{ matrix.os }}
 
-
-  test-log4shell-tester-3-8:
-    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
