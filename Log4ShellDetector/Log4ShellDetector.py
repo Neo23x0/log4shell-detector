@@ -101,7 +101,7 @@ class detector(object):
         matches_in_file = []
         try:
             # Gzipped logs
-            if "log." in file_path and file_path.endswith(".gz"):
+            if "log" in file_path and file_path.endswith(".gz"):
                 with gzip.open(file_path, 'rt') as gzlog:
                     c = 0
                     for line in gzlog: 
