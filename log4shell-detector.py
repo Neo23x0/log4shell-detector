@@ -29,6 +29,18 @@ def evaluate_log_paths():
             print("[D] Adding PATH: %s" % path)
     return paths
 
+def check_log4j_used():
+    checker_commands = [
+        "ps aux | egrep '[l]og4j'",
+        "find / -iname \"log4j*\"",
+        "lsof | grep log4j",
+        "find . -name '*[wj]ar' -print -exec sh -c 'jar tvf {} | grep log4j' \;",
+    ]
+    for checker_command in checker_commands:
+        if len(subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].splitlines()) > 0:
+            return True
+    return False
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
@@ -50,6 +62,16 @@ if __name__ == '__main__':
     print("            /___/                                                            ")
     print(" ")
     print("  Version %s, %s" % (__version__, __author__))
+    
+    print("")
+    date_check_start = datetime.now()
+    print("[.] Check if log4j in used in this system: %s" % date_check_start)
+
+    if check_log4j_used() == False:
+        print("log4j is not being used in this system, exiting..")
+        sys.exit(0)
+    else:
+        print("log4j is being used, an exploit's scan will be performed")
     
     print("")
     date_scan_start = datetime.now()
