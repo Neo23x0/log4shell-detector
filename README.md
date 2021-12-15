@@ -130,6 +130,19 @@ There are different ways how you can help.
 2. Help me find and fix bugs.
 3. Test if the scripts runs with Python 2; if not, we can add a slightly modified version to the repo.
 
+# Test Your Changes
+
+Test your changes to the script with:
+
+```bash 
+pytest
+```
+
+Requires:
+```bash 
+pip install pytest
+```
+
 ## Contact
 
 Twitter: [@cyberops](https://twitter.com/cyb3rops)
