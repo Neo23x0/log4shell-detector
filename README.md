@@ -74,6 +74,7 @@ You can try to find evidence of log4j usage running these commands:
 ps aux | egrep '[l]og4j'
 find / -iname "log4j*"
 lsof | grep log4j
+find . -name '*[wj]ar' -print -exec sh -c 'jar tvf {} | grep log4j' \;
 ```
 
 If none of these commands returned a result, you should be safe.

@@ -151,3 +151,4 @@ if __name__ == '__main__':
     mins, secs = divmod(duration.total_seconds(), 60)
     hours, mins = divmod(mins, 60)
     print("[.] Scan took the following time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
+
