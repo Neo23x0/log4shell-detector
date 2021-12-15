@@ -9,7 +9,7 @@ try:
 except ImportError:
     print("[!] No support for zstandared files without 'zstandard' libary")
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-l4sd_mod = importlib.import_module("Log4ShellDetector")
+from Log4ShellDetector import Log4ShellDetector
 
 TEST_FILE_NAME = "temp-test-file.log"
 
@@ -51,7 +51,7 @@ def test_positives_plain():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = l4sd_mod.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
@@ -71,7 +71,7 @@ def test_positives_gz():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = l4sd_mod.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
@@ -94,7 +94,7 @@ def test_positives_zstd():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = l4sd_mod.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
@@ -114,7 +114,7 @@ def test_negatives_plain():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = l4sd_mod.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test

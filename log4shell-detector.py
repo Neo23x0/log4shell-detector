@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.9.1"
-__date__ = "2021-12-14"
+__version__ = "0.10.0"
+__date__ = "2021-12-15"
 
 import argparse
 import os
@@ -10,7 +10,7 @@ import subprocess
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-import Log4ShellDetector
+import Log4ShellDetector.Log4ShellDetector as Log4ShellDetector
 
 def evaluate_log_paths():
     paths = []
