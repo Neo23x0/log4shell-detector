@@ -4,6 +4,7 @@ import re
 import os
 import copy
 import gzip
+import io 
 
 try:
     from urllib.parse import unquote

