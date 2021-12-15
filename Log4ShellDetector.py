@@ -1,7 +1,6 @@
 
 import base64
 import re
-
 import os
 import copy
 import gzip
@@ -12,10 +11,19 @@ except ImportError:
     from urllib import unquote
 import traceback
 
+_std_supported = False
+try:
+    import zstandard
+    _std_supported = True
+except ImportError:
+    print("[!] No support for zstandared files without 'zstandard' libary")
+
+
 class detector(object):
 
     # These strings will be transformed into detection pads
-    DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:dns:/', '${jndi:nis:/', '${jndi:nds:/', '${jndi:corba:/', '${jndi:iiop:/']
+    DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:', '${jndi:ldaps:', '${jndi:dns:', 
+    '${jndi:nis:', '${jndi:nds:', '${jndi:corba:', '${jndi:iiop:']
     # These strings will be applied as they are
     PLAIN_STRINGS = {
         "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991502": [
@@ -101,6 +109,27 @@ class detector(object):
                         if self.quick and not "2021" in line and not "2022" in line:
                             continue 
                         # Analyze the line  
+                        result = self.check_line(line)
+                        if result:
+                            matches_dict = {
+                                "line_number": c,
+                                "match_string": result,
+                                "line": line.rstrip()
+                            }
+                            matches_in_file.append(matches_dict)
+            # Zstandard logs
+            elif _std_supported and "log." in file_path and file_path.endswith(".zst"):
+                with open(file_path, 'rb') as compressed:
+                    dctx = zstandard.ZstdDecompressor()
+                    stream_reader = dctx.stream_reader(compressed)
+                    text_stream = io.TextIOWrapper(stream_reader, encoding='utf-8')
+                    c = 0
+                    for line in text_stream:
+                        c += 1
+                        # Quick mode - timestamp check
+                        if self.quick and not "2021" in line and not "2022" in line:
+                            continue
+                        # Analyze the line
                         result = self.check_line(line)
                         if result:
                             matches_dict = {
