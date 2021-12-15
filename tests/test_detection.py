@@ -1,11 +1,12 @@
 import sys, os
 import importlib
-import tempfile
 import base64
 import gzip
 from shutil import copyfile
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 l4s = importlib.import_module("log4shell-detector", "Log4ShellDetector")
+
+TEST_FILE_NAME = "temp-test-file.log"
 
 TEST_STRINGS_POSITIVE = [
     "aHR0cC1uaW8tODAtZXhlYy0xMyBXQVJOIEVycm9yIGxvb2tpbmcgdXAgSk5ESSByZXNvdXJjZSBbbGRhcDovLzE5Mi4xNjguMS4xNToxMzM3L2VdLiBqYXZheC5uYW1pbmcuTmFtaW5nRXhjZXB0aW9uIFtSb290IGV4Y2VwdGlvbiBpcyBqYXZhLmxhbmcuQ2xhc3NOb3RGb3VuZEV4Y2VwdGlvbjogb3JnLmFwYWNoZS5jb21tb25zLmJlYW51dGlscy5CZWFuQ29tcGFyYXRvcl07IHJlbWFpbmluZyBuYW1lICdlJwoJYXQgamF2YS5uYW1pbmcvY29tLnN1bi5qbmRpLmxkYXAuT2JqLmRlc2VyaWFsaXplT2JqZWN0KE9iai5qYXZhOjUzMSkKCWF0IGphdmEubmFtaW5nL2NvbS5zdW4uam5kaS5sZGFwLk9iai5kZWNvZGVPYmplY3QoT2JqLmphdmE6MjM3KQoJYXQgamF2YS5uYW1pbmcvY29tLnN1bi5qbmRpLmxkYXAuTGRhcEN0eC5jX2xvb2t1cChMZGFwQ3R4LmphdmE6MTA1MSkKCWF0IGphdmEubmFtaW5nL2NvbS5zdW4uam5kaS50b29sa2l0LmN0eC5Db21wb25lbnRDb250ZXh0LnBfbG9va3VwKENvbXBvbmVudENvbnRleHQuamF2YTo1NDIpCglhdCBqYXZhLm5hbWluZy9jb20uc3VuLmpuZGkudG9vbGtpdC5jdHguUGFydGlhbENvbXBvc2l0ZUNvbnRleHQubG9va3VwKFBhcnRpYWxDb21wb3NpdGVDb250ZXh0LmphdmE6MTc3KQoJYXQgamF2YS5uYW1pbmcvY29tLnN1bi5qbmRpLnRvb2xraXQudXJsLkdlbmVyaWNVUkxDb250ZXh0Lmxvb2t1cChHZW5lcmljVVJMQ29udGV4dC5qYXZhOjIwNykKCWF0IGphdmEubmFtaW5nL2NvbS5zdW4uam5kaS51cmwubGRhcC5sZGFwVVJMQ29udGV4dC5sb29rdXAobGRhcFVSTENvbnRleHQuamF2YTo5NCkKCWF0IGphdmEubmFtaW5nL2phdmF4Lm5hbWluZy5Jbml0aWFsQ29udGV4dC5sb29rdXAoSW5pdGlhbENvbnRleHQuamF2YTo0MDkpCglhdCBvcmcuYXBhY2hlLmxvZ2dpbmcubG9nNGouY29yZS5uZXQuSm5kaU1hbmFnZXIubG9va3VwKEpuZGlNYW5hZ2VyLmphdmE6MTI4KQoJYXQgb3JnLmFwYWNoZS5sb2dnaW5nLmxvZzRqLmNvcmUubG9va3VwLkpuZGlMb29rdXAubG9va3VwKEpuZGlMb29rdXAuamF2YTo1NSkKCWF0IG9yZy5hcGFjaGUubG9nZ2luZy5sb2c0ai5jb3JlLmxvb2t1cC5JbnRlcnBvbGF0b3IubG9va3VwKEludGVycG9sYXRvci5qYXZhOjE1OSkKCWF0IG9yZy5hcGFjaGUubG9nZ2luZy5sb2c0ai5jb3JlLmxvb2t1cC5TdHJTdWJzdGl0dXRvci5yZXNvbHZlVmFyaWFibGUoU3RyU3Vic3RpdHV0b3IuamF2YToxMDQ2KQoJLi4u",
@@ -35,14 +36,14 @@ TEST_STRINGS_NEGATIVE = [
 def test_positives_plain():
     for string_positive in TEST_STRINGS_POSITIVE:
         # Decode test string and write it to a temporary file
-        fp = tempfile.TemporaryFile(delete=False)
-        file_content = base64.b64decode(string_positive)
-        fp.write(file_content)
+        with open(TEST_FILE_NAME, "wb") as fp:
+            file_content = base64.b64decode(string_positive)
+            fp.write(file_content)
         fp.close()
         # Run the test
         l4sd = l4s.Log4ShellDetector(maximum_distance=40, debug=False, quick=False, summary=False)
-        detections = l4sd.scan_file(fp.name)
-        os.unlink(fp.name)
+        detections = l4sd.scan_file(TEST_FILE_NAME)
+        os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
         tested_string = file_content
         if isinstance(file_content, bytes):
@@ -55,14 +56,14 @@ def test_positives_plain():
 def test_positives_gz():
     for string_positive in TEST_STRINGS_POSITIVE_GZ:
         # Decode test string and write it to a temporary file
-        fp = tempfile.TemporaryFile(delete=False)
-        file_content = gzip.decompress(base64.b64decode(string_positive))
-        fp.write(file_content)
+        with open(TEST_FILE_NAME, "wb") as fp:
+            file_content = gzip.decompress(base64.b64decode(string_positive))
+            fp.write(file_content)
         fp.close()
         # Run the test
         l4sd = l4s.Log4ShellDetector(maximum_distance=40, debug=False, quick=False, summary=False)
-        detections = l4sd.scan_file(fp.name)
-        os.unlink(fp.name)
+        detections = l4sd.scan_file(TEST_FILE_NAME)
+        os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
         tested_string = file_content
         if isinstance(file_content, bytes):
@@ -74,16 +75,16 @@ def test_positives_gz():
 
 
 def test_negatives_plain():
-    for string_positive in TEST_STRINGS_NEGATIVE:
+    for string_negative in TEST_STRINGS_NEGATIVE:
         # Decode test string and write it to a temporary file
-        fp = tempfile.TemporaryFile(delete=False)
-        file_content = base64.b64decode(string_positive)
-        fp.write(file_content)
+        with open(TEST_FILE_NAME, "wb") as fp:
+            file_content = base64.b64decode(string_negative)
+            fp.write(file_content)
         fp.close()
         # Run the test
         l4sd = l4s.Log4ShellDetector(maximum_distance=40, debug=False, quick=False, summary=False)
-        detections = l4sd.scan_file(fp.name)
-        os.unlink(fp.name)
+        detections = l4sd.scan_file(TEST_FILE_NAME)
+        os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
         tested_string = file_content
         if isinstance(file_content, bytes):
