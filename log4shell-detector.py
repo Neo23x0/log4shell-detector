@@ -24,7 +24,7 @@ try:
     import zstandard
     _std_supported = True
 except ImportError:
-    print("[!] No support for zstandared files without 'zstandard' libary")
+    print("[!] No support for zstandard files without 'zstandard' library")
 
 DEFAULT_PATHS = ['/var/log', '/storage/log/vmware', '/var/atlassian/application-data/jira/log']
 

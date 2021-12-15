@@ -54,7 +54,7 @@ optional arguments:
 
 2. Download this Repo by clicking "Code" > "Download ZIP"
 
-3. Extract the package and bring only `log4shell-detector.py` to the target system (e.g. with scp)
+3. Extract the package and bring othe comlete package to the target system (e.g. with scp)
 
 4. Run it with `python3 log4shell-detector.py -p /var/log` (if `python3` isn't available use `python`)
 
