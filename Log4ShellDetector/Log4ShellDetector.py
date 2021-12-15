@@ -4,7 +4,8 @@ import re
 import os
 import copy
 import gzip
-import io 
+import io
+import traceback
 
 try:
     from urllib.parse import unquote
@@ -52,7 +53,7 @@ class detector(object):
                 break
         return line
 
-    def base64_decode(self,m):
+    def base64_decode(self, m):
         return base64.b64decode(m.group(1)).decode("utf-8")
 
     def check_line(self, line):
@@ -60,7 +61,11 @@ class detector(object):
         decoded_line = self.decode_line(line)
 
         # Base64 sub
-        decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, decoded_line)
+        try:
+            decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, decoded_line)
+        except Exception as e:
+            if args.debug:
+                traceback.print_exc()
 
         # Plain Detection
         for ref, strings in self.PLAIN_STRINGS.items():
