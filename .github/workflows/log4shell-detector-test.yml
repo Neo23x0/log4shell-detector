@@ -10,6 +10,7 @@ on:
   pull_request:
     branches:
       - master
+      - devel
 
 jobs:
   test-log4shell-tester:
