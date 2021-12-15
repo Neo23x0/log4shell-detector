@@ -13,29 +13,29 @@ on:
       - devel
 
 jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
+        include:
+        - os: macos-latest
+          python-version: 3.9
+    runs-on: ${{ matrix.os }}
 
-  strategy:
-    fail-fast: false
-    matrix:
-      os: [ubuntu-latest]
-      python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
-      include:
-      - os: macos-latest
-        python-version: 3.9
-  runs-on: ${{ matrix.os }}
-
-  steps:
-  - uses: actions/checkout@v2
-  - name: Set up Python ${{ matrix.python-version }}
-    uses: actions/setup-python@v2
-    with:
-      python-version: ${{ matrix.python-version }}
-  - name: Install dependencies
-    run: |
-      python -m pip install --upgrade pip
-      pip install pipenv==2021.5.29
-      pipenv lock
-      pipenv install --dev
-  - name: Test Log4Shell Detector Capabilities
-    run: |
-      pipenv run pytest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv==2021.5.29
+        pipenv lock
+        pipenv install --dev
+    - name: Test Log4Shell Detector Capabilities
+      run: |
+        pipenv run pytest
