@@ -51,7 +51,7 @@ def test_positives_plain():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False, silent=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
@@ -71,7 +71,7 @@ def test_positives_gz():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False, silent=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
@@ -94,7 +94,7 @@ def test_positives_zstd():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False, silent=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
@@ -114,7 +114,7 @@ def test_negatives_plain():
             fp.write(file_content)
         fp.close()
         # Run the test
-        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False)
+        l4sd = Log4ShellDetector.detector(maximum_distance=40, debug=False, quick=False, silent=False)
         detections = l4sd.scan_file(TEST_FILE_NAME)
         os.unlink(TEST_FILE_NAME)
         # Print some info on the failed test
