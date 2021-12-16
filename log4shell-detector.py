@@ -31,7 +31,7 @@ def evaluate_log_paths():
         # Some filters
         skip_append = False
         # If already in list - skip
-        if path in paths: 
+        if path in paths:
             skip_append = True
         # If in exclude list - skip
         for exclude in LINUX_PATH_SKIPS_START:
@@ -39,7 +39,7 @@ def evaluate_log_paths():
                 skip_append = True
         if skip_append:
             continue
-        
+
         # Append the found path
         paths.append(path)
         if args.debug:
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('--silent', action='store_true', help='Silent Mode. Only output on matches and errors')
 
     args = parser.parse_args()
-    
+
     if not args.silent:
         print("     __             ____ ______       ____  ___      __          __          ")
         print("    / /  ___  ___ _/ / // __/ /  ___ / / / / _ \\___ / /____ ____/ /____  ____")
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         print("")
         date_scan_start = datetime.now()
         print("[.] Starting scan DATE: %s" % date_scan_start)
-       
+
     if args.check_usage:
         if check_log4j_used() == False:
             if not args.silent:
@@ -95,13 +95,13 @@ if __name__ == '__main__':
         else:
             if not args.silent:
                 print("[.] log4j is being used, an exploit's scan will be performed.")
-    
+
     # Create Log4Shell Detector Object
     l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick, silent=args.silent)
-    
+
     # Counter
     all_detections = 0
-    
+
     def scan_path(l4sd, path, summary):
         matches = defaultdict(lambda: defaultdict())
         # Loop over files
@@ -114,7 +114,7 @@ if __name__ == '__main__':
                 if len(matches_found) > 0:
                     for m in matches_found:
                         matches[file_path][m['line_number']] = [m['line'], m['match_string']]
-                        
+
         if not summary:
             for match in matches:
                 for line_number in matches[match]:
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         number_of_files_with_detections = len(matches.keys())
         for file_path in matches:
             number_of_detections += len(matches[file_path].keys())
-       
+
         if number_of_detections > 0:
             print("[!] %d files with exploitation attempts detected in PATH: %s" % (number_of_files_with_detections, path))
             if summary:
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
     # Scan file
     if args.f:
-        files = args.f 
+        files = args.f
         for f in files:
             if not os.path.isfile(f):
                 print("[E] File %s doesn't exist" % f, file=sys.stderr)
@@ -150,11 +150,11 @@ if __name__ == '__main__':
                     matches[f][m['line_number']] = [m['line'], m['match_string']]
                 for match in matches:
                     for line_number in matches[match]:
-                        print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s LINE: %s' % 
+                        print('[!] FILE: %s LINE_NUMBER: %s DEOBFUSCATED_STRING: %s LINE: %s' %
                             (match, line_number, matches[match][line_number][1], matches[match][line_number][0])
                         )
             all_detections = len(matches[f].keys())
-    
+
     # Scan paths
     else:
         # Paths
