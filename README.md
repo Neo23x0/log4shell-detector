@@ -67,6 +67,28 @@ optional arguments:
 
 6. Review the results (see FAQs for details)
 
+## Using ansible-playbook
+
+You can also use the `playbook.yml` which copies the needed files on the server,
+runs the script and only shows something if a match was found.
+
+Use it like this:
+
+```bash
+ansible-playbook -i hosts playbook.yml
+```
+
+which could result in something like this:
+
+```ansible
+TASK [Run the script] ******************************************************************************************************************************************************
+fatal: [foo]: FAILED! => changed=false 
+  <omitted>
+  stdout: |-
+    [!] FILE: /var/log/messages LINE_NUMBER: 6098 DEOBFUSCATED_STRING: ${jndi:ldap: LINE: ${jndi:ldap:foo
+    [!] 1 files with exploitation attempts detected in PATH: /var/log/
+```
+
 ## FAQs
 
 ### I don't use log4j on that server but the scanner reports exploitation attempts. Am I affected?

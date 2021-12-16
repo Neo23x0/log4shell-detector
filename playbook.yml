@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: true
+  gather_facts: no
+  vars:
+    log4shell_options: "--silent -p /var/log/"
+  tasks:
+    - name: Create temporary directory
+      ansible.builtin.tempfile:
+        state: directory
+      changed_when: false
+      register: tempdir
+
+    - name: Copy script to server
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ tempdir.path }}"
+        mode: 0700
+      changed_when: false
+      loop:
+        - log4shell-detector.py
+        - Log4ShellDetector
+
+    - name: Run the script
+      ansible.builtin.shell:
+        cmd: "{{ tempdir.path }}/log4shell-detector.py {{ log4shell_options }}"
+      register: log4shell_result
+      changed_when: false
+      failed_when: "'[!]' in log4shell_result.stdout"
+
+    - name: Cleanup
+      ansible.builtin.file:
+        path: "{{ tempdir.path }}"
+        state: absent
+      changed_when: false
+      when: tempdir.path is defined
