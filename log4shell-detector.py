@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.10.1"
+__version__ = "0.11.0"
 __date__ = "2021-12-15"
 
 import argparse
@@ -11,6 +11,8 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 import Log4ShellDetector.Log4ShellDetector as Log4ShellDetector
+
+LINUX_PATH_SKIPS_START = set(["/proc", "/dev", "/sys/kernel/debug", "/sys/kernel/slab", "/sys/devices", "/usr/src/linux"])
 
 def evaluate_log_paths():
     paths = []
@@ -22,8 +24,20 @@ def evaluate_log_paths():
         path = os.path.dirname(o)
         if isinstance(path, bytes):
             path = path.decode("utf-8")
+
+        # Some filters
+        skip_append = False
+        # If already in list - skip
         if path in paths: 
+            skip_append = True
+        # If in exclude list - skip
+        for exclude in LINUX_PATH_SKIPS_START:
+            if path.startswith(exclude):
+                skip_append = True
+        if skip_append:
             continue
+        
+        # Append the found path
         paths.append(path)
         if args.debug:
             print("[D] Adding PATH: %s" % path)
