@@ -34,7 +34,7 @@ def check_log4j_used():
         "ps aux | egrep '[l]og4j'",
         "find / -iname \"log4j*\"",
         "lsof | grep log4j",
-        "find . -name '*[wj]ar' -print -exec sh -c 'jar tvf {} | grep log4j' \;",
+        "grep -r --include *.[wj]ar \"JndiLookup.class\" / 2>&1 | grep matches",
     ]
     for checker_command in checker_commands:
         if len(subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].splitlines()) > 0:
@@ -52,6 +52,7 @@ if __name__ == '__main__':
     parser.add_argument('--quick', action='store_true', help="Skip log lines that don't contain a 2021 or 2022 time stamp")
     parser.add_argument('--debug', action='store_true', help='Debug output')
     parser.add_argument('--summary', action='store_true', help='Show summary only')
+    parser.add_argument('--check_usage', '-c',action='store_true', help='Check if log4j is being used before launching the scan')
 
     args = parser.parse_args()
     
@@ -66,12 +67,13 @@ if __name__ == '__main__':
     print("")
     date_check_start = datetime.now()
     print("[.] Check if log4j in used in this system: %s" % date_check_start)
-
-    if check_log4j_used() == False:
-        print("log4j is not being used in this system, exiting..")
-        sys.exit(0)
-    else:
-        print("log4j is being used, an exploit's scan will be performed")
+    
+    if args.check_usage:
+        if check_log4j_used() == False:
+            print("log4j is not being used in this system, exiting..")
+            sys.exit(0)
+        else:
+            print("log4j is being used, an exploit's scan will be performed")
     
     print("")
     date_scan_start = datetime.now()
