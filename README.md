@@ -105,9 +105,9 @@ If your application is affected and vulnerable and you plan to do a forensic inv
 
 Automatically select file paths to which log files get written. (default: overwrite with -p path or -f file)
 
-### --check_usage / -c
+### --check_usage
 
-Check log4j usage before launching the exploits scan.
+Check log4j usage before launching the exploits scan. The usage of this optional flag stop the execution of the script if there is no log4j being used in the current system, the thing that helps saving time especially when it's about scanning an entire infrastructure.
 
 ### --quick
 
