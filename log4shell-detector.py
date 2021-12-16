@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import print_function
+
 __author__ = "Florian Roth"
 __version__ = "0.11.0"
 __date__ = "2021-12-15"
@@ -7,6 +9,7 @@ __date__ = "2021-12-15"
 import argparse
 import os
 import subprocess
+import sys
 from datetime import datetime, timedelta
 from collections import defaultdict
 
@@ -87,11 +90,11 @@ if __name__ == '__main__':
     if args.check_usage:
         if check_log4j_used() == False:
             if not args.silent:
-                print("log4j is not being used in this system, exiting.")
+                print("[.] log4j is not being used in this system, exiting.")
             sys.exit(0)
         else:
             if not args.silent:
-                print("log4j is being used, an exploit's scan will be performed.")
+                print("[.] log4j is being used, an exploit's scan will be performed.")
     
     # Create Log4Shell Detector Object
     l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick, silent=args.silent)
@@ -137,7 +140,7 @@ if __name__ == '__main__':
         files = args.f 
         for f in files:
             if not os.path.isfile(f):
-                print("[E] File %s doesn't exist" % f)
+                print("[E] File %s doesn't exist" % f, file=sys.stderr)
                 continue
             if not args.silent: print("[.] Scanning FILE: %s ..." % f)
             matches = defaultdict(lambda: defaultdict())
@@ -171,7 +174,7 @@ if __name__ == '__main__':
         # Now scan these paths
         for path in paths:
             if not os.path.isdir(path):
-                print("[E] Path %s doesn't exist" % path)
+                print("[E] Path %s doesn't exist" % path, file=sys.stderr)
                 continue
             if not args.silent: print("[.] Scanning FOLDER: %s ..." % path)
             detections = scan_path(l4sd,path,args.summary)
