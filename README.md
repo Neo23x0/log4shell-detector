@@ -50,6 +50,7 @@ optional arguments:
   --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
   --debug             Debug output
   --summary           Show summary only
+  --silent            Silent Mode. Only output on matches and errors
 ```
 
 ## Get started
@@ -116,6 +117,10 @@ Only checks log lines that contain a `2021` or `2022` to exclude all scanning of
 ### --summary
 
 Prints a summary of matches, with only the filename and line number.
+
+### --silent
+
+Silent Mode. Only output on matches (stdout) and errors (stderr)
 
 ## Requirements
 
