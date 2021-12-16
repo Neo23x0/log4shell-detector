@@ -145,7 +145,7 @@ class detector(object):
                             }
                             matches_in_file.append(matches_dict)
             # Plain Text
-            else:
+            elif self.is_ascii(file_path):
                 with open(file_path, 'r') as logfile:
                     c = 0
                     for line in logfile:
@@ -171,6 +171,13 @@ class detector(object):
             print("[E] Can't process FILE: %s REASON: %s" % (file_path, traceback.print_exc()))
 
         return matches_in_file
+
+    def is_ascii(self, file_path):
+        with open(file_path, "r") as fh:
+            first_2048_bytes = fh.read(2048)
+            if all(ord(c) < 128 for c in first_2048_bytes):
+                return True 
+        return False
 
     def prepare_detections(self, maximum_distance):
         self.detection_pad = {}
