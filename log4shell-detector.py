@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.10.0"
+__version__ = "0.11.0"
 __date__ = "2021-12-15"
 
 import argparse
