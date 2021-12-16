@@ -43,6 +43,18 @@ def evaluate_log_paths():
             print("[D] Adding PATH: %s" % path)
     return paths
 
+def check_log4j_used():
+    checker_commands = [
+        "ps aux | egrep '[l]og4j'",
+        "find / -iname \"log4j*\"",
+        "lsof | grep log4j",
+        "grep -r --include *.[wj]ar \"JndiLookup.class\" / 2>&1 | grep matches",
+    ]
+    for checker_command in checker_commands:
+        if len(subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].splitlines()) > 0:
+            return True
+    return False
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Log4Shell Exploitation Detectors')
@@ -54,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--quick', action='store_true', help="Skip log lines that don't contain a 2021 or 2022 time stamp")
     parser.add_argument('--debug', action='store_true', help='Debug output')
     parser.add_argument('--summary', action='store_true', help='Show summary only')
+    parser.add_argument('--check_usage', '-c',action='store_true', help='Check if log4j is being used before launching the scan')
     parser.add_argument('--silent', action='store_true', help='Silent Mode. Only output on matches and errors')
 
     args = parser.parse_args()
@@ -70,6 +83,15 @@ if __name__ == '__main__':
         print("")
         date_scan_start = datetime.now()
         print("[.] Starting scan DATE: %s" % date_scan_start)
+       
+    if args.check_usage:
+        if check_log4j_used() == False:
+            if not args.silent:
+                print("log4j is not being used in this system, exiting.")
+            sys.exit(0)
+        else:
+            if not args.silent:
+                print("log4j is being used, an exploit's scan will be performed.")
     
     # Create Log4Shell Detector Object
     l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick, silent=args.silent)
