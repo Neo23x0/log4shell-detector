@@ -42,6 +42,7 @@ optional arguments:
   -h, --help          show this help message and exit
   -p path [path ...]  Path to scan
   -d distance         Maximum distance between each character
+  -c check_usage      Check log4j usage before launching the sacan
   --debug             Debug output
   --defaultpaths      Scan a set of default paths that should contain relevant log files.
   --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
