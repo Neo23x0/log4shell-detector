@@ -58,7 +58,7 @@ if __name__ == '__main__':
         print("[.] Starting scan DATE: %s" % date_scan_start)
     
     # Create Log4Shell Detector Object
-    l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick)
+    l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick, silent=args.silent)
     
     # Counter
     all_detections = 0
