@@ -26,7 +26,7 @@ except ImportError:
 class detector(object):
 
     # These strings will be transformed into detection pads
-    DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:', '${jndi:ldaps:', '${jndi:dns:', 
+    DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:', '${jndi:ldaps:', '${jndi:dns:',
     '${jndi:nis:', '${jndi:nds:', '${jndi:corba:', '${jndi:iiop:']
     # These strings will be applied as they are
     PLAIN_STRINGS = {
@@ -34,7 +34,7 @@ class detector(object):
             " header with value of BadAttributeValueException: "
         ],
         "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991700": [
-            "at java.naming/com.sun.jndi.url.ldap.ldapURLContext.lookup(", 
+            "at java.naming/com.sun.jndi.url.ldap.ldapURLContext.lookup(",
             ".log4j.core.lookup.JndiLookup.lookup(JndiLookup"
         ],
         "https://github.com/tangxiaofeng7/CVE-2021-44228-Apache-Log4j-Rce/issues/1": [
@@ -91,7 +91,7 @@ class detector(object):
                     if dp[detection_string]["level"] == 1 and not dp[detection_string]["current_distance"] == 1:
                         # if not ${ but $ .... { do a complete reset of the pad evaluation
                         dp[detection_string]["current_distance"] = 0
-                        dp[detection_string]["level"] = 0 
+                        dp[detection_string]["level"] = 0
                     dp[detection_string]["level"] += 1
                     dp[detection_string]["current_distance"] = 0
                 # If level > 0 count distance to the last char
@@ -100,7 +100,7 @@ class detector(object):
                     # If distance is too big, reset level to zero
                     if dp[detection_string]["current_distance"] > dp[detection_string]["maximum_distance"]:
                         dp[detection_string]["current_distance"] = 0
-                        dp[detection_string]["level"] = 0 
+                        dp[detection_string]["level"] = 0
                 # Is the pad complete
                 if len(dp[detection_string]["chars"]) == dp[detection_string]["level"]:
                     return detection_string
@@ -112,12 +112,12 @@ class detector(object):
             if "log" in file_path and file_path.endswith(".gz"):
                 with gzip.open(file_path, 'rt') as gzlog:
                     c = 0
-                    for line in gzlog: 
+                    for line in gzlog:
                         c += 1
                         # Quick mode - timestamp check
                         if self.quick and not "2021" in line and not "2022" in line:
-                            continue 
-                        # Analyze the line  
+                            continue
+                        # Analyze the line
                         result = self.check_line(line)
                         if result:
                             matches_dict = {
@@ -179,7 +179,7 @@ class detector(object):
         with open(file_path, "r") as fh:
             first_2048_bytes = fh.read(2048)
             if all(ord(c) < 128 for c in first_2048_bytes):
-                return True 
+                return True
         return False
 
     def prepare_detections(self, maximum_distance):
