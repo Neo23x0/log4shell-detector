@@ -4,7 +4,8 @@ import re
 import os
 import copy
 import gzip
-import io 
+import io
+import traceback
 
 try:
     from urllib.parse import unquote
@@ -17,7 +18,7 @@ try:
     import zstandard
     _std_supported = True
 except ImportError:
-    print("[!] No support for zstandard files without 'zstandard' library")
+    print("[E] No support for zstandard files without 'zstandard' library")
 
 
 class detector(object):
@@ -39,10 +40,11 @@ class detector(object):
         ]
     }
 
-    def __init__(self, maximum_distance, debug, quick):
+    def __init__(self, maximum_distance, debug, quick, silent):
         self.prepare_detections(maximum_distance)
         self.debug = debug
         self.quick = quick
+        self.silent = silent
 
     def decode_line(self, line):
         while "%" in line:
@@ -52,7 +54,7 @@ class detector(object):
                 break
         return line
 
-    def base64_decode(self,m):
+    def base64_decode(self, m):
         return base64.b64decode(m.group(1)).decode("utf-8")
 
     def check_line(self, line):
@@ -60,7 +62,11 @@ class detector(object):
         decoded_line = self.decode_line(line)
 
         # Base64 sub
-        decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, decoded_line)
+        try:
+            decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, decoded_line)
+        except Exception as e:
+            if args.debug:
+                traceback.print_exc()
 
         # Plain Detection
         for ref, strings in self.PLAIN_STRINGS.items():
@@ -101,7 +107,7 @@ class detector(object):
         matches_in_file = []
         try:
             # Gzipped logs
-            if "log." in file_path and file_path.endswith(".gz"):
+            if "log" in file_path and file_path.endswith(".gz"):
                 with gzip.open(file_path, 'rt') as gzlog:
                     c = 0
                     for line in gzlog: 

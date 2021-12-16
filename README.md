@@ -34,18 +34,21 @@ I've included a decoder for URL based encodings. If we need more, please let me 
 ## Usage
 
 ```help
-usage: log4shell-detector.py [-h] [-p path [path ...]] [-d maxdis] [--quick] [--defaultpaths] [--debug]
+usage: log4shell-detector.py [-h] [-p path [path ...] | -f path [path ...] | --auto] [-d distance] [--quick] [--debug] [--summary]
 
 Log4Shell Exploitation Detectors
 
 optional arguments:
   -h, --help          show this help message and exit
   -p path [path ...]  Path to scan
+  -f path [path ...]  File to scan
+  --auto              Automatically evaluate locations to which logs get written and scan these folders recursively (new default if no path is given)
   -d distance         Maximum distance between each character
   -c check_usage      Check log4j usage before launching the sacan
   --debug             Debug output
   --defaultpaths      Scan a set of default paths that should contain relevant log files.
   --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
+  --debug             Debug output
   --summary           Show summary only
 ```
 
@@ -98,9 +101,9 @@ If your application is affected and vulnerable and you plan to do a forensic inv
 
 ## Special Flags
 
-### --defaultpaths
+### --auto
 
-Check a list of default log paths used by different software products.
+Automatically select file paths to which log files get written. (default: overwrite with -p path or -f file)
 
 ### --quick
 
@@ -129,6 +132,19 @@ There are different ways how you can help.
 1. Test it against the payloads that you find in the wild and let me know if we miss something.
 2. Help me find and fix bugs.
 3. Test if the scripts runs with Python 2; if not, we can add a slightly modified version to the repo.
+
+# Test Your Changes
+
+Test your changes to the script with:
+
+```bash 
+pytest
+```
+
+Requires:
+```bash 
+pip install pytest
+```
 
 ## Contact
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __author__ = "Florian Roth"
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 __date__ = "2021-12-15"
 
 import argparse
@@ -14,7 +14,7 @@ import Log4ShellDetector.Log4ShellDetector as Log4ShellDetector
 
 def evaluate_log_paths():
     paths = []
-    print("[.] Automatically evaluating the folders to which apps write logs ...")
+    if not args.silent: print("[.] Automatically evaluating the folders to which apps write logs ...")
     command = "lsof 2>/dev/null | grep '\\.log' | sed 's/.* \\//\\//g' | sort | uniq"
     path_eval = subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     output = path_eval.communicate()[0].splitlines()
@@ -78,9 +78,26 @@ if __name__ == '__main__':
     print("")
     date_scan_start = datetime.now()
     print("[.] Starting scan DATE: %s" % date_scan_start)
+
+    parser.add_argument('--silent', action='store_true', help='Silent Mode. Only output on matches and errors')
+
+    args = parser.parse_args()
+    
+    if not args.silent:
+        print("     __             ____ ______       ____  ___      __          __          ")
+        print("    / /  ___  ___ _/ / // __/ /  ___ / / / / _ \\___ / /____ ____/ /____  ____")
+        print("   / /__/ _ \\/ _ `/_  _/\\ \\/ _ \\/ -_) / / / // / -_) __/ -_) __/ __/ _ \\/ __/")
+        print("  /____/\\___/\\_, / /_//___/_//_/\\__/_/_/ /____/\\__/\\__/\\__/\\__/\\__/\\___/_/ ")
+        print("            /___/                                                            ")
+        print(" ")
+        print("  Version %s, %s" % (__version__, __author__))
+
+        print("")
+        date_scan_start = datetime.now()
+        print("[.] Starting scan DATE: %s" % date_scan_start)
     
     # Create Log4Shell Detector Object
-    l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick)
+    l4sd = Log4ShellDetector.detector(maximum_distance=args.d, debug=args.debug, quick=args.quick, silent=args.silent)
     
     # Counter
     all_detections = 0
@@ -115,7 +132,7 @@ if __name__ == '__main__':
                     for line_number in matches[match]:
                         print('[!] FILE: %s LINE_NUMBER: %d STRING: %s' % (match, line_number, matches[match][line_number][1]))
         else:
-            print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
+            if not args.silent: print("[+] No files with exploitation attempts detected in path PATH: %s" % path)
         return number_of_detections
 
     # Scan file
@@ -125,7 +142,7 @@ if __name__ == '__main__':
             if not os.path.isfile(f):
                 print("[E] File %s doesn't exist" % f)
                 continue
-            print("[.] Scanning FILE: %s ..." % f)
+            if not args.silent: print("[.] Scanning FILE: %s ..." % f)
             matches = defaultdict(lambda: defaultdict())
             matches_found = l4sd.scan_file(f)
             if len(matches_found) > 0:
@@ -159,20 +176,20 @@ if __name__ == '__main__':
             if not os.path.isdir(path):
                 print("[E] Path %s doesn't exist" % path)
                 continue
-            print("[.] Scanning FOLDER: %s ..." % path)
+            if not args.silent: print("[.] Scanning FOLDER: %s ..." % path)
             detections = scan_path(l4sd,path,args.summary)
             all_detections += detections
 
     # Finish
-    if all_detections > 0:
-        print("[!!!] %d exploitation attempts detected in the complete scan" % all_detections)
-        
-    else:
-        print("[.] No exploitation attempts detected in the scan")
-    date_scan_end = datetime.now()
-    print("[.] Finished scan DATE: %s" % date_scan_end)
-    duration = date_scan_end - date_scan_start
-    mins, secs = divmod(duration.total_seconds(), 60)
-    hours, mins = divmod(mins, 60)
-    print("[.] Scan took the following time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
+    if not args.silent:
+        if all_detections > 0:
+            print("[!!!] %d exploitation attempts detected in the complete scan" % all_detections)
+        else:
+            print("[.] No exploitation attempts detected in the scan")
+        date_scan_end = datetime.now()
+        print("[.] Finished scan DATE: %s" % date_scan_end)
+        duration = date_scan_end - date_scan_start
+        mins, secs = divmod(duration.total_seconds(), 60)
+        hours, mins = divmod(mins, 60)
+        print("[.] Scan took the following time to complete DURATION: %d hours %d minutes %d seconds" % (hours, mins, secs))
 
