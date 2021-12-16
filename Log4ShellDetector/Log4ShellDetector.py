@@ -18,7 +18,7 @@ try:
     import zstandard
     _std_supported = True
 except ImportError:
-    print("[!] No support for zstandard files without 'zstandard' library")
+    print("[E] No support for zstandard files without 'zstandard' library")
 
 
 class detector(object):
@@ -40,10 +40,11 @@ class detector(object):
         ]
     }
 
-    def __init__(self, maximum_distance, debug, quick):
+    def __init__(self, maximum_distance, debug, quick, silent):
         self.prepare_detections(maximum_distance)
         self.debug = debug
         self.quick = quick
+        self.silent = silent
 
     def decode_line(self, line):
         while "%" in line:
