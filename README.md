@@ -44,7 +44,7 @@ optional arguments:
   -f path [path ...]  File to scan
   --auto              Automatically evaluate locations to which logs get written and scan these folders recursively (new default if no path is given)
   -d distance         Maximum distance between each character
-  -c check_usage      Check log4j usage before launching the sacan
+  -c check_usage      Check log4j usage before launching the scan
   --debug             Debug output
   --defaultpaths      Scan a set of default paths that should contain relevant log files.
   --quick             Skip log lines that don't contain a 2021 or 2022 time stamp
@@ -104,6 +104,10 @@ If your application is affected and vulnerable and you plan to do a forensic inv
 ### --auto
 
 Automatically select file paths to which log files get written. (default: overwrite with -p path or -f file)
+
+### --check_usage / -c
+
+Check log4j usage before launching the exploits scan.
 
 ### --quick
 
