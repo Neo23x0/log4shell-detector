@@ -149,26 +149,26 @@ class detector(object):
                             }
                             matches_in_file.append(matches_dict)
             # Zipped logs
-			elif "log" in file_path and file_path.endswith(".zip"):
-				with zipfile.ZipFile(file_path, 'r') as zfile:
-					file_list = zfile.namelist()
-					for file_name in file_list:
-						with io.TextIOWrapper( zfile.open(name=file_name, mode='r'), encoding="utf-8" ) as zlog:
-							c = 0
-							for line in zlog: 
-								c += 1
-								# Quick mode - timestamp check
-								if self.quick and not "2021" in line and not "2022" in line:
-									continue 
-								# Analyze the line  
-								result = self.check_line(line)
-								if result:
-									matches_dict = {
-										"line_number": c,
-										"match_string": result,
-										"line": line.rstrip()
-									}
-									matches_in_file.append(matches_dict)                            
+            elif "log" in file_path and file_path.endswith(".zip"):
+                with zipfile.ZipFile(file_path, 'r') as zfile:
+                    file_list = zfile.namelist()
+                    for file_name in file_list:
+                        with io.TextIOWrapper( zfile.open(name=file_name, mode='r'), encoding="utf-8" ) as zlog:
+                            c = 0
+                            for line in zlog: 
+                                c += 1
+                                # Quick mode - timestamp check
+                                if self.quick and not "2021" in line and not "2022" in line:
+                                    continue 
+                                # Analyze the line  
+                                result = self.check_line(line)
+                                if result:
+                                    matches_dict = {
+                                        "line_number": c,
+                                        "match_string": result,
+                                        "line": line.rstrip()
+                                    }
+                                    matches_in_file.append(matches_dict)                            
             # Plain Text
             elif self.is_ascii(file_path):
                 with open(file_path, 'r') as logfile:
