@@ -17,7 +17,7 @@ try:
     import zstandard
     _std_supported = True
 except ImportError:
-    print("[!] No support for zstandard files without 'zstandard' library")
+    print("[E] No support for zstandard files without 'zstandard' library")
 
 
 class detector(object):
