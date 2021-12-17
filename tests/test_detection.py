@@ -49,7 +49,7 @@ TEST_STRINGS_NEGATIVE = [
 def test_positives_plain():
     for string_positive in TEST_STRINGS_POSITIVE:
         # Decode test string and write it to a temporary file
-        with open(TEST_FILE_NAME, "wb") as fp:
+        with open(TEST_FILE_NAME, "ab") as fp:
             file_content = base64.b64decode(string_positive)
             fp.write(file_content)
         fp.close()
@@ -69,7 +69,7 @@ def test_positives_plain():
 def test_positives_gz():
     for string_positive in TEST_STRINGS_POSITIVE_GZ:
         # Decode test string and write it to a temporary file
-        with open(TEST_FILE_NAME, "wb") as fp:
+        with open(TEST_FILE_NAME, "ab") as fp:
             file_content = gzip.decompress(base64.b64decode(string_positive))
             fp.write(file_content)
         fp.close()
@@ -92,7 +92,7 @@ def test_positives_zstd():
         return
     for string_positive in TEST_STRINGS_POSITIVE_GZ:
         # Decode test string and write it to a temporary file
-        with open(TEST_FILE_NAME, "wb") as fp:
+        with open(TEST_FILE_NAME, "ab") as fp:
             file_content = gzip.decompress(base64.b64decode(string_positive))
             fp.write(file_content)
         fp.close()
@@ -112,7 +112,7 @@ def test_positives_zstd():
 def test_negatives_plain():
     for string_negative in TEST_STRINGS_NEGATIVE:
         # Decode test string and write it to a temporary file
-        with open(TEST_FILE_NAME, "wb") as fp:
+        with open(TEST_FILE_NAME, "ab") as fp:
             file_content = base64.b64decode(string_negative)
             fp.write(file_content)
         fp.close()
