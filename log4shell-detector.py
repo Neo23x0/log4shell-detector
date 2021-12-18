@@ -3,7 +3,7 @@
 from __future__ import print_function
 
 __author__ = "Florian Roth"
-__version__ = "0.11.0"
+__version__ = "0.11.1"
 __date__ = "2021-12-15"
 
 import argparse
