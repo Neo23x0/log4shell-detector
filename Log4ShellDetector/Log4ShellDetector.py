@@ -80,11 +80,10 @@ class detector(object):
         # Detection Pad based Detection
         # Preparation
         decoded_line = decoded_line.lower()
-        linechars = list(decoded_line)
         # temporary detection pad
         dp = copy.deepcopy(self.detection_pad)
         # Walk over characters
-        for c in linechars:
+        for c in decoded_line:
             for detection_string in dp:
                 # If the character in the line matches the character in the detection
                 if c == dp[detection_string]["chars"][dp[detection_string]["level"]]:
