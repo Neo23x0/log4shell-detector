@@ -54,7 +54,7 @@ def check_log4j_used():
         "grep -r --include *.[wj]ar \"JndiLookup.class\" / 2>&1 | grep matches",
     ]
     for checker_command in checker_commands:
-        if len(subprocess.Popen(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].splitlines()) > 0:
+        if len(subprocess.Popen(checker_command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT).communicate()[0].splitlines()) > 0:
             return True
     return False
 
