@@ -67,7 +67,7 @@ class detector(object):
         try:
             decoded_line = re.sub(r"\${base64:([^}]+)}", self.base64_decode, decoded_line)
         except Exception as e:
-            if args.debug:
+            if self.debug:
                 traceback.print_exc()
 
         # Plain Detection
