@@ -28,7 +28,7 @@ class detector(object):
 
     # These strings will be transformed into detection pads
     DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:', '${jndi:ldaps:', '${jndi:dns:',
-    '${jndi:nis:', '${jndi:nds:', '${jndi:corba:', '${jndi:iiop:']
+    '${jndi:nis:', '${jndi:nds:', '${jndi:corba:', '${jndi:iiop:', '${jndi:http:']
     # These strings will be applied as they are
     PLAIN_STRINGS = {
         "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991502": [
