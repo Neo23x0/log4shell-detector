@@ -1,0 +1,63 @@
+name: Package Application with Pyinstaller
+
+on: 
+  push:
+    tags:
+    - '*'
+
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
+        include:
+        - os: macos-latest
+          python-version: 3.9
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv==2021.5.29
+        pipenv lock
+        pipenv install --dev
+    - name: Test Log4Shell Detector Capabilities
+      run: |
+        pipenv run pytest
+        
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Package Application Windows
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: ./
+        
+    - name: Package Application linux
+      uses: JackMcKew/pyinstaller-action-linux@main
+      with:
+        path: ./
+        
+    - name: Rename Files
+      run: |
+        mv "dist/windows/log4shell-detector.exe" "dist/windows/log4shell-detector-win.exe"
+        mv "dist/linux/log4shell-detector" "dist/linux/log4shell-detector-lin"
+        
+    - uses: ncipollo/release-action@v1.9.0
+      with:
+        draft: true
+        artifacts: "dist/windows/*.exe,dist/linux/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
