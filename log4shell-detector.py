@@ -13,7 +13,7 @@ import sys
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-import Log4ShellDetector as Log4ShellDetector
+import Log4ShellDetector.Log4ShellDetector as Log4ShellDetector
 
 LINUX_PATH_SKIPS_START = set(["/proc", "/dev", "/sys/kernel/debug", "/sys/kernel/slab", "/sys/devices", "/usr/src/linux"])
 
