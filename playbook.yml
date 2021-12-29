@@ -3,7 +3,7 @@
   become: true
   gather_facts: no
   vars:
-    log4shell_options: "--silent -p /var/log/"
+    log4shell_options: "-p /var/log/"
   pre_tasks:
     - name: Check Python Version
       ansible.builtin.shell: 'python3 --version'
