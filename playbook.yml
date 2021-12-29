@@ -3,14 +3,24 @@
   become: true
   gather_facts: no
   vars:
-    log4shell_options: "--silent -p /var/log/"
+    log4shell_options: "-p /var/log/"
+  pre_tasks:
+    - name: Check Python Version
+      ansible.builtin.shell: 'python3 --version'
+      register: python_version
+      failed_when: "'Python' not in python_version.stdout"
+
+    - name: Verify zstandard Python Library
+      ansible.builtin.shell: 'python3 -c "import zstandard"'
+      register: zstandard_status
+      failed_when: zstandard_status.rc != 0
+
   tasks:
     - name: Check server for log4j IOC
       block:
       - name: Create temporary directory
         ansible.builtin.tempfile:
           state: directory
-        changed_when: false
         register: tempdir
 
       - name: Copy script to server
@@ -18,7 +28,6 @@
           src: "{{ item }}"
           dest: "{{ tempdir.path }}"
           mode: 0700
-        changed_when: false
         loop:
           - log4shell-detector.py
           - Log4ShellDetector
@@ -27,14 +36,20 @@
         ansible.builtin.shell:
           cmd: "{{ tempdir.path }}/log4shell-detector.py {{ log4shell_options }}"
         register: log4shell_result
-        changed_when: false
         async: 0
         poll: 30
         failed_when: "'[!]' in log4shell_result.stdout"
+        notify:
+        - Detector Output
+
       always:
       - name: Cleanup
         ansible.builtin.file:
           path: "{{ tempdir.path }}"
           state: absent
-        changed_when: false
         when: tempdir.path is defined
+
+  handlers:
+    - name: Detector Output
+      debug:
+        msg: "{{ log4shell_result }}"
