@@ -39,6 +39,8 @@
         async: 0
         poll: 30
         failed_when: "'[!]' in log4shell_result.stdout"
+        notify:
+        - Detector Output
 
       always:
       - name: Cleanup
@@ -47,6 +49,7 @@
           state: absent
         when: tempdir.path is defined
 
-    - name: log4shell-detector output 
+  handlers:
+    - name: Detector Output
       debug:
         msg: "{{ log4shell_result }}"
