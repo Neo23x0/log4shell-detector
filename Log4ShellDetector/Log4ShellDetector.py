@@ -9,9 +9,18 @@ import zipfile
 import io
 import traceback
 import sys
-# To check whether testing error comes fro the package
 #from anyascii import anyascii #Package for converting any unicode to ascii
+import subprocess
+import sys
 
+## installing and importing anyascii package
+try:
+    from anyascii import anyascii
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", 'anyascii'])
+finally:
+    from anyascii import anyascii
+    
 try:
     from urllib.parse import unquote
 except ImportError:
