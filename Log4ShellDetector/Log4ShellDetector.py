@@ -9,7 +9,8 @@ import zipfile
 import io
 import traceback
 import sys
-from anyascii import anyascii #Package for converting any unicode to ascii
+# To check whether testing error comes fro the package
+#from anyascii import anyascii #Package for converting any unicode to ascii
 
 try:
     from urllib.parse import unquote
