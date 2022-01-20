@@ -9,6 +9,7 @@ import zipfile
 import io
 import traceback
 import sys
+from anyascii import anyascii #Package for converting any unicode to ascii
 
 try:
     from urllib.parse import unquote
@@ -27,8 +28,11 @@ except ImportError:
 class detector(object):
 
     # These strings will be transformed into detection pads
-    DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:', '${jndi:ldaps:', '${jndi:dns:',
-    '${jndi:nis:', '${jndi:nds:', '${jndi:corba:', '${jndi:iiop:', '${jndi:http:']
+    #DETECTION_STRINGS = ['${jndi:ldap:', '${jndi:rmi:', '${jndi:ldaps:', '${jndi:dns:',
+    #'${jndi:nis:', '${jndi:nds:', '${jndi:corba:', '${jndi:iiop:', '${jndi:http:']
+    
+    DETECTION_STRINGS = ['${jndi:ldap:/', '${jndi:rmi:/', '${jndi:ldaps:/', '${jndi:dns:/',
+    '${jndi:nis:/', '${jndi:nds:/', '${jndi:corba:/', '${jndi:iiop:/', '${jndi:http:/']
     # These strings will be applied as they are
     PLAIN_STRINGS = {
         "https://gist.github.com/Neo23x0/e4c8b03ff8cdf1fa63b7d15db6e3860b#gistcomment-3991502": [
@@ -56,13 +60,19 @@ class detector(object):
             if line == line_before:
                 break
         return line
-
+    #Converting to ASCII
+    def anyunicode_decode(self,line):
+        return anyascii(line)
+    
     def base64_decode(self, m):
         return base64.b64decode(m.group(1)).decode("utf-8")
 
     def check_line(self, line):
         # Decode Line
         decoded_line = self.decode_line(line)
+        
+        # Decoding any invalid unicodes present 
+        decoded_line = self.anyunicode_decode(decoded_line)
 
         # Base64 sub
         try:
@@ -186,6 +196,24 @@ class detector(object):
                                 "line": line.rstrip()
                             }
                             matches_in_file.append(matches_dict)
+            # Non ASCII plain text                
+            else:
+                with open(file_path, 'r') as logfile:
+                    c = 0
+                    for line in logfile:
+                        c += 1
+                        # Quick mode - timestamp check
+                        if self.quick and not "2021" in line and not "2022" in line:
+                            continue
+                        # Analyze the line
+                        result = self.check_line(line)
+                        if result:
+                            matches_dict = {
+                                "line_number": c,
+                                "match_string": result,
+                                "line": line.rstrip()
+                            }
+                            matches_in_file.append(matches_dict)                    
         except UnicodeDecodeError as e:
             if self.debug:
                 print("[E] Can't process FILE: %s REASON: most likely not an ASCII based log file" % file_path, file=sys.stderr)
